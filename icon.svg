@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d0d14"/>
+      <stop offset="100%" stop-color="#13131e"/>
+    </linearGradient>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f5ff50"/>
+      <stop offset="100%" stop-color="#39e080"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Dumbbell -->
+  <rect x="56" y="220" width="62" height="72" rx="16" fill="#4fa3ff"/>
+  <rect x="90" y="200" width="40" height="112" rx="12" fill="#4fa3ff"/>
+  <rect x="130" y="236" width="252" height="40" rx="12" fill="#c8c8e0"/>
+  <rect x="382" y="200" width="40" height="112" rx="12" fill="#f5ff50"/>
+  <rect x="394" y="220" width="62" height="72" rx="16" fill="#f5ff50"/>
+  <!-- Sweat drop -->
+  <path d="M256 100 C256 100 230 140 230 158 C230 172 241.2 184 256 184 C270.8 184 282 172 282 158 C282 140 256 100 256 100Z" fill="rgba(79,163,255,0.8)"/>
+  <!-- Stars -->
+  <text x="180" y="130" font-size="32" fill="#f5ff50" opacity="0.8" font-family="sans-serif">✦</text>
+  <text x="310" y="140" font-size="24" fill="#f5ff50" opacity="0.6" font-family="sans-serif">✦</text>
+  <!-- Text -->
+  <text x="256" y="400" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="88" fill="white" letter-spacing="4">IRON</text>
+  <text x="432" y="400" text-anchor="end" font-family="sans-serif" font-weight="900" font-size="88" fill="#f5ff50" letter-spacing="4">IQ</text>
+  <text x="256" y="440" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="24" fill="rgba(255,255,255,0.4)" letter-spacing="8">ENTRENA INTELIGENTE</text>
+</svg>
