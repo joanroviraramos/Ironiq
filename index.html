@@ -1702,83 +1702,104 @@ function generateLocalPlan(){
   const W=(mul)=>String(Math.round((w*mul)/2.5)*2.5);
 
   // ═══ EXERCISE POOLS BY MUSCLE GROUP ═══
+  // 5-6+ options per group so equipment/injury filters never leave sessions empty
   const EX={
-    // GLÚTEOS — ejercicios específicos
     gluteos_compound:[
-      {name:'Hip Thrust con Barra',muscle:'Glúteos',equipment:'Barra',type:'hip_thrust',sets:4,reps:'10-12',weight:W(wm.hipthrust),rest:'90s',tips:['Aprieta glúteos 2 seg arriba','Barbilla al pecho para evitar hiperextensión lumbar','Pies a la anchura de caderas, talones cerca del glúteo']},
-      {name:'Sentadilla Sumo con Mancuerna',muscle:'Glúteos',equipment:'Mancuerna',type:'squat',sets:4,reps:'12-15',weight:W(wm.squat*0.4),rest:'90s',tips:['Pies muy anchos, puntas a 45°','Aprieta glúteos fuerte al subir','Baja hasta que los muslos estén paralelos']},
-      {name:'Sentadilla Búlgara',muscle:'Glúteos',equipment:'Mancuernas',type:'lunge',sets:3,reps:'10-12',weight:W(wm.lunge),rest:'60s',tips:['Inclina ligeramente el torso adelante para más glúteo','Pie trasero elevado en banco','Empuja con el talón del pie delantero']},
-      {name:'Peso Muerto Rumano',muscle:'Glúteos',equipment:'Barra',type:'rdl',sets:4,reps:'10-12',weight:W(wm.rdl),rest:'90s',tips:['Siente el estiramiento en isquios y glúteos','Aprieta glúteos al subir','Barra siempre pegada al cuerpo']},
+      {name:'Hip Thrust con Barra',muscle:'Glúteos',equipment:'Barra',type:'hip_thrust',sets:4,reps:'10-12',weight:W(wm.hipthrust),rest:'90s',tips:['Aprieta glúteos 2 seg arriba','Barbilla al pecho para no hiperextender','Pies a anchura de caderas']},
+      {name:'Sentadilla Sumo',muscle:'Glúteos',equipment:'Mancuerna',type:'squat',sets:4,reps:'12-15',weight:W(wm.squat*0.4),rest:'90s',tips:['Pies muy anchos, puntas a 45°','Aprieta glúteos al subir','Baja hasta muslos paralelos']},
+      {name:'Sentadilla Búlgara',muscle:'Glúteos',equipment:'Mancuernas',type:'lunge',sets:3,reps:'10-12',weight:W(wm.lunge),rest:'75s',tips:['Torso adelante para más glúteo','Pie trasero en banco','Empuja con talón delantero']},
+      {name:'Peso Muerto Rumano',muscle:'Glúteos',equipment:'Barra',type:'rdl',sets:4,reps:'10-12',weight:W(wm.rdl),rest:'90s',tips:['Estiramiento en isquios y glúteos','Aprieta glúteos al subir','Barra pegada al cuerpo']},
+      {name:'Hip Thrust con Mancuerna',muscle:'Glúteos',equipment:'Mancuerna',type:'hip_thrust',sets:4,reps:'12-15',weight:W(wm.hipthrust*0.4),rest:'75s',tips:['Mancuerna en la cadera','Mismo patrón que con barra','Buena opción sin barra']},
+      {name:'Peso Muerto Sumo',muscle:'Glúteos',equipment:'Barra',type:'deadlift',sets:4,reps:'8-10',weight:W(wm.deadlift*0.8),rest:'90s',tips:['Agarre estrecho entre piernas','Pies anchos, puntas afuera','Mayor activación glúteos que convencional']},
     ],
     gluteos_isolation:[
-      {name:'Patada Trasera en Polea',muscle:'Glúteos',equipment:'Polea Baja',type:'hip_thrust',sets:3,reps:'12-15',weight:W(0.12),rest:'60s',tips:['Extensión completa de cadera','No arquees la lumbar','Aprieta glúteo 1 seg en la cima']},
-      {name:'Puente de Glúteos con Banda',muscle:'Glúteos',equipment:'Banda Elástica',type:'hip_thrust',sets:3,reps:'15-20',weight:'0',rest:'45s',tips:['Banda por encima de rodillas','Separa rodillas al subir','Contracción máxima arriba']},
-      {name:'Abducción en Máquina',muscle:'Glúteos',equipment:'Máquina',type:'hip_thrust',sets:3,reps:'15-20',weight:W(0.3),rest:'45s',tips:['Trabaja el glúteo medio','Mantén la espalda pegada','Aguanta 1 seg al abrir']},
-      {name:'Caminata Lateral con Banda',muscle:'Glúteos',equipment:'Banda Elástica',type:'plank',sets:3,reps:'15 pasos',weight:'0',rest:'45s',tips:['Posición de media sentadilla','Banda por encima de rodillas','Pasos cortos y controlados']},
-      {name:'Peso Muerto a Una Pierna',muscle:'Glúteos',equipment:'Mancuerna',type:'rdl',sets:3,reps:'10-12',weight:W(wm.lunge),rest:'60s',tips:['Pierna trasera alineada con torso','Excelente para glúteo medio y estabilidad','Baja lento, sube con control']},
+      {name:'Patada Trasera en Polea',muscle:'Glúteos',equipment:'Polea Baja',type:'hip_thrust',sets:3,reps:'12-15',weight:W(0.12),rest:'60s',tips:['Extensión completa de cadera','No arquees la lumbar','Aprieta glúteo 1 seg arriba']},
+      {name:'Puente de Glúteos',muscle:'Glúteos',equipment:'Peso Corporal',type:'hip_thrust',sets:3,reps:'15-20',weight:'0',rest:'45s',tips:['Pies planos en el suelo','Aprieta glúteos al máximo arriba','Progresión natural al hip thrust']},
+      {name:'Abducción en Máquina',muscle:'Glúteos',equipment:'Máquina',type:'hip_thrust',sets:3,reps:'15-20',weight:W(0.3),rest:'45s',tips:['Trabaja glúteo medio','Espalda pegada','Aguanta 1 seg abierto']},
+      {name:'Caminata Lateral con Banda',muscle:'Glúteos',equipment:'Banda Elástica',type:'plank',sets:3,reps:'15 pasos',weight:'0',rest:'45s',tips:['Media sentadilla constante','Banda encima de rodillas','Pasos cortos y controlados']},
+      {name:'Peso Muerto a Una Pierna',muscle:'Glúteos',equipment:'Mancuerna',type:'rdl',sets:3,reps:'10-12',weight:W(wm.lunge),rest:'60s',tips:['Pierna trasera alineada con torso','Excelente para glúteo medio','Baja lento, sube con control']},
+      {name:'Elevación de Cadera en Máquina',muscle:'Glúteos',equipment:'Máquina',type:'hip_thrust',sets:3,reps:'12-15',weight:W(wm.hipthrust*0.6),rest:'60s',tips:['Ajusta bien el rodillo','Contracción máxima arriba','No uses impulso']},
     ],
-    // PIERNAS
     piernas_compound:[
-      {name:'Sentadilla con Barra',muscle:'Piernas',equipment:'Barra',type:'squat',sets:4,reps:isFemale?'8-10':'6-8',weight:W(wm.squat),rest:'120s',tips:['Baja hasta paralelo o más profundo','Peso distribuido en todo el pie','Rodillas siguiendo la dirección de los pies']},
-      {name:'Prensa de Piernas',muscle:'Piernas',equipment:'Máquina',type:'leg_press',sets:3,reps:'10-12',weight:W(wm.legpress),rest:'90s',tips:['No bloquees rodillas arriba','Pies altos = más isquios; pies bajos = más cuádriceps','Baja hasta 90 grados de flexión']},
-      {name:'Sentadilla Frontal',muscle:'Piernas',equipment:'Barra',type:'squat',sets:4,reps:'8-10',weight:W(wm.squat*0.7),rest:'90s',tips:['Barra en clavículas, codos altos','Torso más vertical que sentadilla trasera','Más énfasis en cuádriceps']},
-      {name:'Hack Squat',muscle:'Piernas',equipment:'Máquina',type:'squat',sets:3,reps:'10-12',weight:W(wm.legpress*0.6),rest:'90s',tips:['Pies adelantados para más cuádriceps','No bloquees las rodillas arriba','Rango completo de movimiento']},
+      {name:'Sentadilla con Barra',muscle:'Piernas',equipment:'Barra',type:'squat',sets:4,reps:isFemale?'8-10':'6-8',weight:W(wm.squat),rest:'120s',tips:['Baja hasta paralelo o más','Peso en todo el pie','Rodillas en dirección de pies']},
+      {name:'Prensa de Piernas',muscle:'Piernas',equipment:'Máquina',type:'leg_press',sets:4,reps:'10-12',weight:W(wm.legpress),rest:'90s',tips:['No bloquees rodillas arriba','Pies altos=más isquios, bajos=más cuádriceps','Baja hasta 90°']},
+      {name:'Sentadilla Frontal',muscle:'Piernas',equipment:'Barra',type:'squat',sets:4,reps:'8-10',weight:W(wm.squat*0.7),rest:'90s',tips:['Barra en clavículas, codos altos','Torso más vertical','Más cuádriceps']},
+      {name:'Hack Squat',muscle:'Piernas',equipment:'Máquina',type:'squat',sets:4,reps:'10-12',weight:W(wm.legpress*0.6),rest:'90s',tips:['Pies adelantados = más cuádriceps','No bloquees rodillas','Rango completo']},
+      {name:'Sentadilla Goblet',muscle:'Piernas',equipment:'Mancuerna',type:'squat',sets:3,reps:'12-15',weight:W(wm.squat*0.3),rest:'75s',tips:['Mancuerna al pecho','Ideal para aprender sentadilla','Codos dentro de rodillas abajo']},
+      {name:'Step-Up con Mancuernas',muscle:'Piernas',equipment:'Mancuernas',type:'lunge',sets:3,reps:'10-12',weight:W(wm.lunge),rest:'75s',tips:['Sube con talón del pie de apoyo','Banco alto = más glúteo','No impulses con pierna trasera']},
     ],
     piernas_isolation:[
-      {name:'Extensión de Cuádriceps',muscle:'Piernas',equipment:'Máquina',type:'squat',sets:3,reps:'12-15',weight:W(wm.squat*0.5),rest:'60s',tips:['Extiende completamente las piernas','Mantén 1 segundo arriba','Baja lento para más tensión']},
-      {name:'Curl Femoral Tumbado',muscle:'Piernas',equipment:'Máquina',type:'rdl',sets:3,reps:'10-12',weight:W(wm.rdl*0.4),rest:'60s',tips:['Caderas pegadas al banco','Aprieta isquios en la cima','Excéntrica lenta de 3 segundos']},
-      {name:'Zancadas Caminando',muscle:'Piernas',equipment:'Mancuernas',type:'lunge',sets:3,reps:'12-14',weight:W(wm.lunge),rest:'60s',tips:['Torso erguido y recto','Rodilla trasera casi al suelo','Empuja con el talón delantero']},
-      {name:'Elevación de Talones',muscle:'Piernas',equipment:'Máquina',type:'calf_raise',sets:4,reps:'15-20',weight:W(wm.calf),rest:'45s',tips:['Rango completo: baja todo lo que puedas','Contracción 1 seg arriba','Punta recta para gastrocnemio']},
+      {name:'Extensión de Cuádriceps',muscle:'Piernas',equipment:'Máquina',type:'squat',sets:3,reps:'12-15',weight:W(wm.squat*0.5),rest:'60s',tips:['Extiende completamente','1 seg arriba','Baja lento']},
+      {name:'Curl Femoral Tumbado',muscle:'Piernas',equipment:'Máquina',type:'rdl',sets:3,reps:'10-12',weight:W(wm.rdl*0.4),rest:'60s',tips:['Caderas pegadas al banco','Aprieta isquios arriba','Excéntrica 3 seg']},
+      {name:'Curl Femoral Sentado',muscle:'Piernas',equipment:'Máquina',type:'rdl',sets:3,reps:'10-12',weight:W(wm.rdl*0.35),rest:'60s',tips:['Mayor rango que tumbado','Empuja tobillo abajo','Contracción completa']},
+      {name:'Zancadas Caminando',muscle:'Piernas',equipment:'Mancuernas',type:'lunge',sets:3,reps:'12-14',weight:W(wm.lunge),rest:'60s',tips:['Torso erguido','Rodilla trasera casi al suelo','Empuja con talón']},
+      {name:'Elevación de Talones de Pie',muscle:'Piernas',equipment:'Máquina',type:'calf_raise',sets:4,reps:'15-20',weight:W(wm.calf),rest:'45s',tips:['Rango completo: baja todo','1 seg arriba','Punta recta']},
+      {name:'Elevación de Talones Sentado',muscle:'Piernas',equipment:'Máquina',type:'calf_raise',sets:3,reps:'15-20',weight:W(wm.calf*0.6),rest:'45s',tips:['Trabaja sóleo','Platos sobre rodillas','Rango completo']},
     ],
-    // PECHO
     pecho_compound:[
-      {name:'Press de Banca',muscle:'Pecho',equipment:'Barra',type:'bench_press',sets:4,reps:'8-10',weight:W(wm.bench),rest:'90s',tips:['Escápulas retraídas y deprimidas','Baja controlado 3 seg hasta el pecho','Empuje explosivo con los pies firmes']},
-      {name:'Press Inclinado Mancuernas',muscle:'Pecho',equipment:'Mancuernas',type:'incline_press',sets:4,reps:'10-12',weight:W(wm.incline),rest:'90s',tips:['Banco a 30-45 grados','No arquees la espalda baja','Contrae arriba uniendo las mancuernas']},
-      {name:'Fondos para Pecho',muscle:'Pecho',equipment:'Paralelas',type:'dip',sets:3,reps:'8-12',weight:'0',rest:'90s',tips:['Inclínate hacia adelante para trabajar pecho','Baja hasta sentir estiramiento','Agarre algo más ancho que hombros']},
+      {name:'Press de Banca',muscle:'Pecho',equipment:'Barra',type:'bench_press',sets:4,reps:'8-10',weight:W(wm.bench),rest:'90s',tips:['Escápulas retraídas','Baja 3 seg al pecho','Empuje explosivo, pies firmes']},
+      {name:'Press Inclinado Mancuernas',muscle:'Pecho',equipment:'Mancuernas',type:'incline_press',sets:4,reps:'10-12',weight:W(wm.incline),rest:'90s',tips:['Banco 30-45°','No arquees espalda baja','Contrae uniendo mancuernas']},
+      {name:'Fondos para Pecho',muscle:'Pecho',equipment:'Paralelas',type:'dip',sets:3,reps:'8-12',weight:'0',rest:'90s',tips:['Inclínate adelante','Baja hasta estiramiento','Agarre más ancho que hombros']},
+      {name:'Press Banca Mancuernas',muscle:'Pecho',equipment:'Mancuernas',type:'bench_press',sets:4,reps:'8-10',weight:W(wm.incline*1.2),rest:'90s',tips:['Mayor rango que barra','Controla bajada 2-3 seg','Une mancuernas arriba']},
+      {name:'Press Inclinado Barra',muscle:'Pecho',equipment:'Barra',type:'incline_press',sets:4,reps:'8-10',weight:W(wm.bench*0.8),rest:'90s',tips:['Banco 30-45° máximo','Más pecho superior','Baja hasta clavícula']},
+      {name:'Press en Máquina',muscle:'Pecho',equipment:'Máquina',type:'bench_press',sets:3,reps:'10-12',weight:W(wm.bench*0.8),rest:'75s',tips:['Ideal para principiantes','Movimiento guiado','No bloquees codos']},
     ],
     pecho_isolation:[
-      {name:'Cruces en Polea',muscle:'Pecho',equipment:'Poleas',type:'cable_fly',sets:3,reps:'12-15',weight:W(wm.fly),rest:'60s',tips:['Ligero arco en el codo','Aprieta fuerte en la contracción central','Control total en la vuelta']},
-      {name:'Aperturas con Mancuernas',muscle:'Pecho',equipment:'Mancuernas',type:'cable_fly',sets:3,reps:'12-15',weight:W(wm.fly),rest:'60s',tips:['Ligera flexión del codo constante','Hasta sentir estiramiento en el pecho','Movimiento en arco, no en línea recta']},
-      {name:'Flexiones',muscle:'Pecho',equipment:'Peso Corporal',type:'push_up',sets:3,reps:'15-20',weight:'0',rest:'60s',tips:['Cuerpo recto de cabeza a talones','Codos a 45 grados del cuerpo','Toca el pecho casi en el suelo']},
+      {name:'Cruces en Polea',muscle:'Pecho',equipment:'Poleas',type:'cable_fly',sets:3,reps:'12-15',weight:W(wm.fly),rest:'60s',tips:['Ligero arco en codo','Aprieta al cerrar','Control total en vuelta']},
+      {name:'Aperturas con Mancuernas',muscle:'Pecho',equipment:'Mancuernas',type:'cable_fly',sets:3,reps:'12-15',weight:W(wm.fly),rest:'60s',tips:['Ligera flexión de codo','Hasta sentir estiramiento','Arco, no línea recta']},
+      {name:'Flexiones',muscle:'Pecho',equipment:'Peso Corporal',type:'push_up',sets:3,reps:'15-20',weight:'0',rest:'60s',tips:['Cuerpo recto','Codos a 45°','Pecho casi al suelo']},
+      {name:'Cruces Polea Baja',muscle:'Pecho',equipment:'Poleas',type:'cable_fly',sets:3,reps:'12-15',weight:W(wm.fly*0.8),rest:'60s',tips:['Poleas al suelo','Pecho superior','Manos arriba y adelante']},
+      {name:'Pec Deck (Mariposa)',muscle:'Pecho',equipment:'Máquina',type:'cable_fly',sets:3,reps:'12-15',weight:W(wm.fly*1.5),rest:'60s',tips:['Codos a 90°','No dejes caer brazos atrás','Contracción al centro']},
     ],
-    // ESPALDA
     espalda_compound:[
-      {name:'Dominadas',muscle:'Espalda',equipment:'Barra Fija',type:'pull_up',sets:4,reps:isFemale?'4-8':'6-10',weight:'0',rest:'120s',tips:['Lleva el pecho a la barra','Baja completamente y controlado','Agarre prono activa más dorsal']},
-      {name:'Remo con Barra',muscle:'Espalda',equipment:'Barra',type:'row',sets:4,reps:'8-10',weight:W(wm.row),rest:'90s',tips:['Espalda paralela al suelo','Aprieta las escápulas en la cima','La barra toca el abdomen bajo']},
-      {name:'Jalón al Pecho',muscle:'Espalda',equipment:'Polea Alta',type:'lat_pulldown',sets:3,reps:'10-12',weight:W(wm.pulldown),rest:'90s',tips:['Barra hasta clavícula','Aprieta dorsales al bajar la barra','Espalda ligeramente inclinada atrás']},
+      {name:'Dominadas',muscle:'Espalda',equipment:'Barra Fija',type:'pull_up',sets:4,reps:isFemale?'4-8':'6-10',weight:'0',rest:'120s',tips:['Pecho a la barra','Baja completo y controlado','Agarre prono = más dorsal']},
+      {name:'Remo con Barra',muscle:'Espalda',equipment:'Barra',type:'row',sets:4,reps:'8-10',weight:W(wm.row),rest:'90s',tips:['Espalda paralela al suelo','Aprieta escápulas arriba','Barra al abdomen bajo']},
+      {name:'Jalón al Pecho',muscle:'Espalda',equipment:'Polea Alta',type:'lat_pulldown',sets:4,reps:'10-12',weight:W(wm.pulldown),rest:'90s',tips:['Barra hasta clavícula','Aprieta dorsales','Espalda inclinada']},
+      {name:'Remo en Máquina',muscle:'Espalda',equipment:'Máquina',type:'row',sets:3,reps:'10-12',weight:W(wm.row*0.8),rest:'75s',tips:['Pecho apoyado = aísla dorsales','Tira hacia abdomen','Excéntrica 2-3 seg']},
+      {name:'Remo Unilateral Mancuerna',muscle:'Espalda',equipment:'Mancuerna',type:'row',sets:3,reps:'10-12',weight:W(wm.row*0.35),rest:'75s',tips:['Rodilla y mano en banco','Codo al techo','No gires torso']},
+      {name:'Jalón Agarre Estrecho',muscle:'Espalda',equipment:'Polea Alta',type:'lat_pulldown',sets:3,reps:'10-12',weight:W(wm.pulldown*0.9),rest:'75s',tips:['Agarre neutro o supino','Más zona inferior dorsal','Codos hacia caderas']},
     ],
     espalda_isolation:[
-      {name:'Remo Unilateral Mancuerna',muscle:'Espalda',equipment:'Mancuerna',type:'row',sets:3,reps:'10-12',weight:W(wm.row*0.35),rest:'60s',tips:['Apoya rodilla y mano en el banco','Lleva el codo hacia el techo','No gires el torso']},
-      {name:'Face Pull',muscle:'Espalda',equipment:'Polea Alta',type:'face_pull',sets:3,reps:'15-20',weight:W(wm.facepull),rest:'60s',tips:['Polea a altura de la cara','Separa manos en W al tirar','Retrae y eleva las escápulas']},
-      {name:'Peso Muerto Convencional',muscle:'Espalda',equipment:'Barra',type:'deadlift',sets:4,reps:'5-6',weight:W(wm.deadlift),rest:'120s',tips:['Espalda neutra SIEMPRE','Barra pegada al cuerpo','Empuja el suelo, no tires de la barra']},
+      {name:'Face Pull',muscle:'Espalda',equipment:'Polea Alta',type:'face_pull',sets:3,reps:'15-20',weight:W(wm.facepull),rest:'60s',tips:['Polea a altura de cara','Separa manos en W','Retrae y eleva escápulas']},
+      {name:'Peso Muerto Convencional',muscle:'Espalda',equipment:'Barra',type:'deadlift',sets:4,reps:'5-6',weight:W(wm.deadlift),rest:'120s',tips:['Espalda neutra SIEMPRE','Barra pegada al cuerpo','Empuja el suelo, no tires']},
+      {name:'Remo en Polea Sentado',muscle:'Espalda',equipment:'Polea Baja',type:'row',sets:3,reps:'10-12',weight:W(wm.pulldown*0.8),rest:'75s',tips:['Agarre neutro','Tira al ombligo','Controla la vuelta']},
+      {name:'Pullover con Mancuerna',muscle:'Espalda',equipment:'Mancuerna',type:'lat_pulldown',sets:3,reps:'12-15',weight:W(wm.incline*0.8),rest:'60s',tips:['Acostado transversal en banco','Estira dorsal al bajar','Brazo ligeramente flexionado']},
     ],
-    // HOMBROS
     hombros_compound:[
-      {name:'Press Militar con Barra',muscle:'Hombros',equipment:'Barra',type:'shoulder_press',sets:4,reps:'8-10',weight:W(wm.shoulder),rest:'90s',tips:['Core activado y faja natural','No arquees la lumbar al subir','Empuja hasta casi bloquear']},
-      {name:'Press Arnold',muscle:'Hombros',equipment:'Mancuernas',type:'shoulder_press',sets:3,reps:'10-12',weight:W(wm.shoulder*0.6),rest:'90s',tips:['Rotación de muñeca al subir','Trabaja las 3 cabezas del deltoides','Movimiento fluido y controlado']},
+      {name:'Press Militar con Barra',muscle:'Hombros',equipment:'Barra',type:'shoulder_press',sets:4,reps:'8-10',weight:W(wm.shoulder),rest:'90s',tips:['Core activado','No arquees lumbar','Empuja hasta casi bloquear']},
+      {name:'Press Arnold',muscle:'Hombros',equipment:'Mancuernas',type:'shoulder_press',sets:3,reps:'10-12',weight:W(wm.shoulder*0.6),rest:'90s',tips:['Rotación de muñeca al subir','Trabaja 3 cabezas del deltoides','Fluido y controlado']},
+      {name:'Press Hombros Mancuernas',muscle:'Hombros',equipment:'Mancuernas',type:'shoulder_press',sets:4,reps:'8-10',weight:W(wm.shoulder*0.7),rest:'90s',tips:['Codos a 90° abajo','Sube hasta casi tocar','Mayor rango que barra']},
+      {name:'Press Hombros en Máquina',muscle:'Hombros',equipment:'Máquina',type:'shoulder_press',sets:3,reps:'10-12',weight:W(wm.shoulder*0.9),rest:'75s',tips:['Ideal para principiantes','Movimiento guiado','Ajusta bien la altura']},
     ],
     hombros_isolation:[
-      {name:'Elevaciones Laterales',muscle:'Hombros',equipment:'Mancuernas',type:'lateral_raise',sets:4,reps:'12-15',weight:W(wm.lateral),rest:'60s',tips:['Sube hasta altura de hombros','Control total en la bajada','Sin impulso del cuerpo']},
-      {name:'Pájaros Invertidos',muscle:'Hombros',equipment:'Mancuernas',type:'face_pull',sets:3,reps:'12-15',weight:W(wm.lateral*0.8),rest:'60s',tips:['Torso inclinado a 45 grados','Brazos en T en la cima','Trabaja el deltoides posterior']},
-      {name:'Elevaciones Frontales',muscle:'Hombros',equipment:'Mancuernas',type:'lateral_raise',sets:3,reps:'12-15',weight:W(wm.lateral),rest:'60s',tips:['No subas más allá de los hombros','Sin impulso','Baja lentamente 2-3 seg']},
+      {name:'Elevaciones Laterales',muscle:'Hombros',equipment:'Mancuernas',type:'lateral_raise',sets:4,reps:'12-15',weight:W(wm.lateral),rest:'60s',tips:['Sube hasta hombros','Control total bajando','Sin impulso']},
+      {name:'Pájaros Invertidos',muscle:'Hombros',equipment:'Mancuernas',type:'face_pull',sets:3,reps:'12-15',weight:W(wm.lateral*0.8),rest:'60s',tips:['Torso inclinado 45°','Brazos en T arriba','Deltoides posterior']},
+      {name:'Elevaciones Frontales',muscle:'Hombros',equipment:'Mancuernas',type:'lateral_raise',sets:3,reps:'12-15',weight:W(wm.lateral),rest:'60s',tips:['No subas más allá de hombros','Sin impulso','Baja lento 2-3 seg']},
+      {name:'Elevación Lateral en Polea',muscle:'Hombros',equipment:'Polea Baja',type:'lateral_raise',sets:3,reps:'12-15',weight:W(wm.lateral*1.5),rest:'60s',tips:['Tensión constante','Cable cruzado por delante','Más efectivo por tensión abajo']},
+      {name:'Encogimientos con Mancuernas',muscle:'Hombros',equipment:'Mancuernas',type:'shoulder_press',sets:3,reps:'12-15',weight:W(wm.row*0.35),rest:'60s',tips:['Hombros a las orejas','Sin rotar hombros','1 seg arriba']},
     ],
-    // BRAZOS
     biceps:[
-      {name:'Curl con Barra',muscle:'Bíceps',equipment:'Barra',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl),rest:'60s',tips:['Codos fijos a los costados','Contracción total en la cima','Baja en 3 seg (excéntrica lenta)']},
-      {name:'Curl Martillo',muscle:'Bíceps',equipment:'Mancuernas',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl*0.5),rest:'60s',tips:['Agarre neutro: pulgar arriba','Trabaja el braquial','Solo mueve el antebrazo']},
-      {name:'Curl Inclinado en Banco',muscle:'Bíceps',equipment:'Mancuernas',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl*0.4),rest:'60s',tips:['Banco a 45-60 grados','Mayor estiramiento del bíceps','No lleves los codos adelante']},
+      {name:'Curl con Barra',muscle:'Bíceps',equipment:'Barra',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl),rest:'60s',tips:['Codos fijos a los costados','Contracción total arriba','Excéntrica 3 seg']},
+      {name:'Curl Martillo',muscle:'Bíceps',equipment:'Mancuernas',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl*0.5),rest:'60s',tips:['Agarre neutro: pulgar arriba','Trabaja braquial','Solo mueve antebrazo']},
+      {name:'Curl Inclinado en Banco',muscle:'Bíceps',equipment:'Mancuernas',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl*0.4),rest:'60s',tips:['Banco 45-60°','Mayor estiramiento bíceps','No lleves codos adelante']},
+      {name:'Curl en Polea Baja',muscle:'Bíceps',equipment:'Polea Baja',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl*0.8),rest:'60s',tips:['Tensión constante','Contrae al máximo arriba','Controla la vuelta']},
+      {name:'Curl Concentrado',muscle:'Bíceps',equipment:'Mancuerna',type:'curl',sets:3,reps:'10-12',weight:W(wm.curl*0.35),rest:'45s',tips:['Codo en interior del muslo','Máximo aislamiento','Gira muñeca al subir']},
     ],
     triceps:[
-      {name:'Jalón de Tríceps Polea Alta',muscle:'Tríceps',equipment:'Polea Alta',type:'tricep',sets:3,reps:'12-15',weight:W(wm.tricep),rest:'60s',tips:['Codos pegados a los costados','Extensión completa abajo','No muevas los codos al tirar']},
-      {name:'Extensión Overhead Mancuerna',muscle:'Tríceps',equipment:'Mancuerna',type:'tricep',sets:3,reps:'10-12',weight:W(wm.tricep*0.8),rest:'60s',tips:['Codos pegados a la cabeza','Rango completo de movimiento','Baja hasta sentir el estiramiento']},
-      {name:'Fondos en Paralelas',muscle:'Tríceps',equipment:'Paralelas',type:'dip',sets:3,reps:'8-12',weight:'0',rest:'90s',tips:['Cuerpo vertical para trabajar tríceps','Codos cerca del cuerpo','Baja hasta 90 grados de flexión']},
+      {name:'Jalón de Tríceps Polea',muscle:'Tríceps',equipment:'Polea Alta',type:'tricep',sets:3,reps:'12-15',weight:W(wm.tricep),rest:'60s',tips:['Codos pegados a costados','Extensión completa abajo','No muevas codos']},
+      {name:'Extensión Overhead Mancuerna',muscle:'Tríceps',equipment:'Mancuerna',type:'tricep',sets:3,reps:'10-12',weight:W(wm.tricep*0.8),rest:'60s',tips:['Codos pegados a la cabeza','Rango completo','Baja hasta estiramiento']},
+      {name:'Fondos en Paralelas',muscle:'Tríceps',equipment:'Paralelas',type:'dip',sets:3,reps:'8-12',weight:'0',rest:'90s',tips:['Cuerpo vertical = tríceps','Codos cerca del cuerpo','Baja hasta 90°']},
+      {name:'Jalón con Cuerda',muscle:'Tríceps',equipment:'Polea Alta',type:'tricep',sets:3,reps:'12-15',weight:W(wm.tricep*0.7),rest:'60s',tips:['Separa cuerda abajo','Rotación externa','Más cabeza lateral']},
+      {name:'Press Francés Barra EZ',muscle:'Tríceps',equipment:'Barra EZ',type:'tricep',sets:3,reps:'10-12',weight:W(wm.tricep*1.2),rest:'75s',tips:['Baja hacia frente/nuca','Solo mueve antebrazo','Codos al techo']},
+      {name:'Fondos en Banco',muscle:'Tríceps',equipment:'Banco',type:'dip',sets:3,reps:'12-15',weight:'0',rest:'60s',tips:['Manos en borde del banco','Espalda cerca del banco','Añade peso para progresar']},
     ],
-    // CORE
     core:[
-      {name:'Plancha Estándar',muscle:'Core',equipment:'Peso Corporal',type:'plank',sets:3,reps:'45-60s',weight:'0',rest:'60s',tips:['Cuerpo recto de cabeza a talones','Core completamente contraído','Respira normalmente']},
-      {name:'Crunch de Bicicleta',muscle:'Core',equipment:'Peso Corporal',type:'plank',sets:3,reps:'20',weight:'0',rest:'45s',tips:['Rota el torso, no el cuello','Toca codo con rodilla opuesta','Pierna estirada cerca del suelo']},
-      {name:'Elevación de Piernas Colgado',muscle:'Core',equipment:'Barra Fija',type:'plank',sets:3,reps:'10-15',weight:'0',rest:'60s',tips:['Agarre firme','Sube rodillas al pecho o piernas rectas','No osciles el cuerpo']},
-      {name:'Pallof Press',muscle:'Core',equipment:'Polea',type:'plank',sets:3,reps:'12-15',weight:W(0.08),rest:'45s',tips:['Anti-rotación: muy funcional','De pie lateral a la polea','Extiende los brazos sin rotar el torso']},
+      {name:'Plancha',muscle:'Core',equipment:'Peso Corporal',type:'plank',sets:3,reps:'45-60s',weight:'0',rest:'60s',tips:['Cuerpo recto','Core contraído','Respira normal']},
+      {name:'Crunch de Bicicleta',muscle:'Core',equipment:'Peso Corporal',type:'plank',sets:3,reps:'20',weight:'0',rest:'45s',tips:['Rota torso, no cuello','Codo con rodilla opuesta','Pierna estirada cerca del suelo']},
+      {name:'Elevación Piernas Colgado',muscle:'Core',equipment:'Barra Fija',type:'plank',sets:3,reps:'10-15',weight:'0',rest:'60s',tips:['Agarre firme','Rodillas al pecho o piernas rectas','No osciles']},
+      {name:'Pallof Press',muscle:'Core',equipment:'Polea',type:'plank',sets:3,reps:'12-15',weight:W(0.08),rest:'45s',tips:['Anti-rotación funcional','De pie lateral a polea','Extiende brazos sin rotar']},
+      {name:'Rueda Abdominal',muscle:'Core',equipment:'Peso Corporal',type:'plank',sets:3,reps:'10-12',weight:'0',rest:'60s',tips:['De los más efectivos','Espalda plana siempre','Empieza de rodillas']},
+      {name:'Crunch en Polea Alta',muscle:'Core',equipment:'Polea Alta',type:'plank',sets:3,reps:'12-15',weight:W(0.15),rest:'45s',tips:['Arrodillado frente a polea','Flexiona cadera Y columna','Frente a las rodillas']},
     ],
   };
 
@@ -1787,6 +1808,18 @@ function generateLocalPlan(){
     const shuffled=[...arr].sort(()=>Math.random()-0.5);
     return shuffled.slice(0,Math.min(n,arr.length));
   }
+
+  // Realistic duration: ~8 min/compound (4 sets × 90s rest + work), ~5 min/isolation (3 sets × 60s + work), +5 min warmup
+  function calcDuration(exercises){
+    let t=5;
+    exercises.forEach(ex=>{
+      const sets=ex.sets||3;
+      const rest=parseInt(String(ex.rest||'60').replace('s',''))||60;
+      t+=(sets*30+(sets-1)*rest)/60;
+    });
+    return Math.round(Math.min(75,Math.max(40,t)));
+  }
+
 
   // Choose split pattern based on days, gender, priorities
   function chooseSplit(numDays){
@@ -1857,14 +1890,16 @@ function generateLocalPlan(){
   }
 
   // Build a workout from a session template key
+  // RULE: Every session = 5-6 exercises, 3-4 sets each, ~60 min
+  // Structure: 2-3 compound + 2-3 isolation/accessories
   function buildSession(key){
     const s={exercises:[],muscles:[],name:'',duration:60};
     switch(key){
       case 'gluteos_piernas':
         s.name='🍑 GLÚTEOS & CUÁDRICEPS';
         s.muscles=['Glúteos','Piernas'];
-        s.exercises=[...pick(EX.gluteos_compound,3),...pick(EX.piernas_compound,1),...pick(EX.gluteos_isolation,2)];
-        s.duration=65;break;
+        s.exercises=[...pick(EX.gluteos_compound,2),...pick(EX.piernas_compound,1),...pick(EX.gluteos_isolation,2),...pick(EX.piernas_isolation,1)];
+        break;
       case 'gluteos_isquios':
         s.name='🍑 GLÚTEOS & ISQUIOTIBIALES';
         s.muscles=['Glúteos','Piernas'];
@@ -1875,93 +1910,97 @@ function generateLocalPlan(){
           ...pick(EX.gluteos_isolation,2),
           ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1),
         ].filter(Boolean);
-        s.duration=60;break;
+        break;
       case 'fullbody_glute':
         s.name='⚡ FULL BODY + GLÚTEO';
         s.muscles=['Glúteos','Pecho','Espalda'];
         s.exercises=[...pick(EX.gluteos_compound,2),...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.gluteos_isolation,1),...pick(EX.core,1)];
-        s.duration=55;break;
+        break;
       case 'upper_light':
         s.name='💪 TREN SUPERIOR';
         s.muscles=['Pecho','Espalda','Hombros'];
         s.exercises=[...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,2),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1),...pick(EX.triceps,1)];
-        s.duration=55;break;
+        break;
       case 'upper_push':
         s.name='🔥 EMPUJE (PUSH)';
         s.muscles=['Pecho','Hombros','Tríceps'];
-        s.exercises=[...pick(EX.pecho_compound,2),...pick(EX.hombros_compound,1),...pick(EX.hombros_isolation,1),...pick(EX.pecho_isolation,1),...pick(EX.triceps,1)];
-        s.duration=60;break;
+        s.exercises=[...pick(EX.pecho_compound,2),...pick(EX.hombros_compound,1),...pick(EX.pecho_isolation,1),...pick(EX.hombros_isolation,1),...pick(EX.triceps,1)];
+        break;
       case 'upper_pull':
         s.name='💪 TIRÓN (PULL)';
         s.muscles=['Espalda','Bíceps'];
-        s.exercises=[...pick(EX.espalda_compound,3),...pick(EX.espalda_isolation.filter(e=>e.name.includes('Face')),1),...pick(EX.biceps,2)];
-        s.duration=60;break;
+        s.exercises=[...pick(EX.espalda_compound,3),...pick(EX.espalda_isolation,1),...pick(EX.biceps,2)];
+        break;
       case 'lower_full':
         s.name='🦵 PIERNAS COMPLETO';
         s.muscles=['Piernas','Glúteos'];
-        s.exercises=[...pick(EX.piernas_compound,2),...pick(EX.gluteos_compound,2),...pick(EX.piernas_isolation,1),...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1)];
-        s.duration=65;break;
+        s.exercises=[...pick(EX.piernas_compound,2),...pick(EX.gluteos_compound,1),...pick(EX.piernas_isolation,2),...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1)];
+        break;
       case 'lower_glute':
         s.name='🍑 TREN INFERIOR + GLÚTEO';
         s.muscles=['Glúteos','Piernas'];
         s.exercises=[...pick(EX.gluteos_compound,2),...pick(EX.piernas_compound,1),...pick(EX.gluteos_isolation,2),...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1)];
-        s.duration=60;break;
+        break;
       case 'upper_full':
         s.name='🏋️ TREN SUPERIOR COMPLETO';
         s.muscles=['Pecho','Espalda','Hombros'];
         s.exercises=[...pick(EX.pecho_compound,2),...pick(EX.espalda_compound,2),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1)];
-        s.duration=60;break;
+        break;
       case 'fullbody_f':
         s.name='⚡ FULL BODY';
         s.muscles=['Piernas','Glúteos','Espalda','Pecho'];
         s.exercises=[...pick(EX.gluteos_compound,1),...pick(EX.piernas_compound,1),...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.hombros_isolation,1),...pick(EX.core,1)];
-        s.duration=55;break;
+        break;
       case 'fullbody_m':
         s.name='⚡ FULL BODY';
         s.muscles=['Pecho','Espalda','Piernas'];
         s.exercises=[...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.piernas_compound,1),...pick(EX.hombros_compound,1),...pick(EX.biceps,1),...pick(EX.core,1)];
-        s.duration=60;break;
+        break;
       case 'pecho_triceps':
         s.name='🔥 PECHO & TRÍCEPS';
         s.muscles=['Pecho','Tríceps'];
         s.exercises=[...pick(EX.pecho_compound,3),...pick(EX.pecho_isolation,1),...pick(EX.triceps,2)];
-        s.duration=65;break;
+        break;
       case 'espalda_biceps':
         s.name='💪 ESPALDA & BÍCEPS';
         s.muscles=['Espalda','Bíceps'];
         s.exercises=[...pick(EX.espalda_compound,3),...pick(EX.espalda_isolation,1),...pick(EX.biceps,2)];
-        s.duration=65;break;
+        break;
       case 'piernas_full':
         s.name='🦵 PIERNAS COMPLETO';
         s.muscles=['Piernas','Glúteos'];
         s.exercises=[...pick(EX.piernas_compound,2),...pick(EX.gluteos_compound,1),...pick(EX.piernas_isolation,2),...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1)];
-        s.duration=65;break;
+        break;
       case 'hombros_brazos':
         s.name='🦾 HOMBROS & BRAZOS';
         s.muscles=['Hombros','Bíceps','Tríceps'];
         s.exercises=[...pick(EX.hombros_compound,2),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1),...pick(EX.triceps,2)];
-        s.duration=55;break;
+        break;
       case 'pecho_hombros':
         s.name='🔥 PECHO & HOMBROS';
         s.muscles=['Pecho','Hombros'];
         s.exercises=[...pick(EX.pecho_compound,2),...pick(EX.hombros_compound,1),...pick(EX.pecho_isolation,1),...pick(EX.hombros_isolation,2)];
-        s.duration=60;break;
+        break;
       case 'brazos_core':
         s.name='💪 BRAZOS & CORE';
         s.muscles=['Bíceps','Tríceps','Core'];
         s.exercises=[...pick(EX.biceps,2),...pick(EX.triceps,2),...pick(EX.core,2)];
-        s.duration=50;break;
+        break;
       case 'core_cardio':
         s.name='🧱 CORE & FUNCIONAL';
-        s.muscles=['Core','Full Body'];
-        s.exercises=[...pick(EX.core,3),...pick(EX.gluteos_isolation,1),...pick(EX.hombros_isolation,1)];
-        s.duration=45;break;
+        s.muscles=['Core','Glúteos','Hombros'];
+        s.exercises=[...pick(EX.core,3),...pick(EX.gluteos_isolation,1),...pick(EX.hombros_isolation,1),...pick(EX.piernas_isolation,1)];
+        break;
       default:
         s.name='💪 ENTRENO GENERAL';
         s.muscles=['Full Body'];
-        s.exercises=[...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.piernas_compound,1),...pick(EX.hombros_isolation,1),...pick(EX.core,1)];
-        s.duration=55;
+        s.exercises=[...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.piernas_compound,1),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1),...pick(EX.core,1)];
     }
+    // Remove duplicates by name
+    const seen=new Set();
+    s.exercises=s.exercises.filter(e=>{if(seen.has(e.name))return false;seen.add(e.name);return true;});
+    // Calculate realistic duration from actual exercises
+    s.duration=calcDuration(s.exercises);
     return s;
   }
 
@@ -2040,9 +2079,15 @@ function generateLocalPlan(){
     });
     
     // Ensure minimum exercises
-    if(sess.exercises.length<3){
-      const fallbacks=[...pick(EX.core,1),...pick(EX.gluteos_isolation,1)];
-      sess.exercises.push(...fallbacks.slice(0,3-sess.exercises.length));
+    if(sess.exercises.length<5){
+      // Fill up from related pools until we have 5
+      const fillers=[...EX.core,...EX.gluteos_isolation,...EX.hombros_isolation,...EX.piernas_isolation,...EX.biceps,...EX.triceps];
+      const filtered=filterEquip(filterInjuries(fillers));
+      const existing=new Set(sess.exercises.map(e=>e.name));
+      for(const ex of filtered){
+        if(sess.exercises.length>=5)break;
+        if(!existing.has(ex.name)){sess.exercises.push({...ex});existing.add(ex.name);}
+      }
     }
     
     // Apply level & goal mods
