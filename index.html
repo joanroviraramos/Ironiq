@@ -351,11 +351,22 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 .modal-title{font-family:'Avenir Next Condensed','Impact','Arial Black',sans-serif;font-size:22px;letter-spacing:.5px;line-height:1.2}
 .modal-sub{font-size:12px;color:var(--text2);margin-top:3px}
 .modal-close{
-  background:var(--card2);border:1px solid var(--border2);border-radius:8px;
-  width:32px;height:32px;color:var(--text2);cursor:pointer;font-size:16px;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+  background:var(--card2);border:1px solid var(--border2);border-radius:12px;
+  width:44px;height:44px;color:var(--text2);cursor:pointer;font-size:20px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
-
+.modal-close-bottom{
+  width:100%;padding:12px 16px 18px;
+  background:var(--bg);border-top:1px solid var(--border);
+  position:sticky;bottom:0;flex-shrink:0;
+}
+.modal-close-bottom button{
+  width:100%;padding:14px;border-radius:14px;
+  background:var(--card2);border:1px solid var(--border2);
+  color:var(--text2);font-size:15px;font-weight:700;letter-spacing:.5px;
+  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
 /* ── EXERCISE ILLUSTRATION ── */
 .ex-illus-wrap{
   background:#0d0d14;
@@ -1060,6 +1071,9 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
       <div class="tips-sec">
         <div class="tips-lbl">TÉCNICA</div>
         <div id="mel-tips"></div>
+      </div>
+      <div class="modal-close-bottom">
+        <button onclick="closeModal()">Cerrar</button>
       </div>
     </div>
   </div>
