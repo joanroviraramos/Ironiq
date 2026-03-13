@@ -1790,6 +1790,37 @@ function generateLocalPlan(){
 
   // Choose split pattern based on days, gender, priorities
   function chooseSplit(numDays){
+    const style=wizStyle||'auto';
+    
+    // ── Style-based overrides (when user explicitly chose a style) ──
+    if(style==='push_pull'){
+      if(numDays<=3) return ['upper_push','upper_pull','piernas_full'];
+      if(numDays===4) return ['upper_push','upper_pull','piernas_full',priGluteos?'gluteos_isquios':'hombros_brazos'];
+      if(numDays===5) return ['upper_push','upper_pull','piernas_full',priGluteos?'gluteos_isquios':'hombros_brazos',priGluteos?'gluteos_piernas':'upper_full'];
+      return ['upper_push','upper_pull','piernas_full','upper_push','upper_pull',priGluteos?'gluteos_piernas':'lower_full'];
+    }
+    if(style==='torso_pierna'){
+      if(numDays<=3) return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full'];
+      if(numDays===4) return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full',priGluteos?'gluteos_isquios':'piernas_full'];
+      if(numDays===5) return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full',priGluteos?'gluteos_isquios':'piernas_full','brazos_core'];
+      return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full',priGluteos?'gluteos_isquios':'piernas_full','brazos_core','core_cardio'];
+    }
+    if(style==='fullbody'){
+      const fb=isFemale?'fullbody_f':'fullbody_m';
+      const fbg='fullbody_glute';
+      if(numDays<=3) return [fb,priGluteos?fbg:fb,fb];
+      if(numDays===4) return [fb,priGluteos?fbg:fb,fb,priGluteos?fbg:fb];
+      if(numDays===5) return [fb,priGluteos?fbg:fb,fb,priGluteos?fbg:fb,fb];
+      return [fb,priGluteos?fbg:fb,fb,priGluteos?fbg:fb,fb,fb];
+    }
+    if(style==='weider'){
+      if(numDays<=3) return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full'];
+      if(numDays===4) return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full','hombros_brazos'];
+      if(numDays===5) return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full','hombros_brazos','brazos_core'];
+      return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full','hombros_brazos','brazos_core','core_cardio'];
+    }
+    
+    // ── Auto / Antagonista: gender & priority based (original logic) ──
     // Female with glute priority → glute-focused splits
     if(isFemale && (priGluteos || priPiernas)){
       if(numDays<=3) return ['gluteos_piernas','upper_light','gluteos_isquios'];
@@ -1810,6 +1841,13 @@ function generateLocalPlan(){
       if(numDays===4) return ['pecho_triceps','espalda_biceps','piernas_full','pecho_hombros'];
       if(numDays===5) return ['pecho_triceps','espalda_biceps','piernas_full','pecho_hombros','brazos_core'];
       return ['pecho_triceps','espalda_biceps','piernas_full','pecho_hombros','brazos_core','fullbody_m'];
+    }
+    // Male with glute priority
+    if(priGluteos){
+      if(numDays<=3) return ['gluteos_piernas','upper_full','gluteos_isquios'];
+      if(numDays===4) return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull'];
+      if(numDays===5) return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull','piernas_full'];
+      return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull','piernas_full','hombros_brazos'];
     }
     // Male default
     if(numDays<=3) return ['pecho_triceps','espalda_biceps','piernas_full'];
@@ -1933,11 +1971,80 @@ function generateLocalPlan(){
   const lmod=levelMod[level]||{weightMul:1,setsMod:0};
   const gmod=goalMod[goal]||{sets:0,reps:0};
 
+  // ═══ WIZARD DATA: Equipment filtering ═══
+  const equip=wizData?.equipment||'gym';
+  const equipBlacklist={
+    minimal:['Barra','Polea Alta','Polea Baja','Poleas','Máquina','Paralelas','Barra Fija','Banco Scott','Polea','Barra T','Banco Romano'],
+    home_db:['Polea Alta','Polea Baja','Poleas','Máquina','Paralelas','Barra Fija','Banco Scott','Polea','Barra T','Banco Romano'],
+    basic:['Máquina','Banco Scott','Barra T','Banco Romano'],
+    gym:[]
+  };
+  const blacklist=equipBlacklist[equip]||[];
+  function filterEquip(exercises){
+    if(!blacklist.length)return exercises;
+    const filtered=exercises.filter(ex=>!blacklist.some(b=>ex.equipment.includes(b)));
+    return filtered.length?filtered:exercises.slice(0,1); // keep at least 1
+  }
+
+  // ═══ WIZARD DATA: Injury filtering ═══
+  const injuries=(wizData?.injuries||[]).filter(p=>p!=='ninguna');
+  const injuryBlacklist={
+    hombro:['Press Militar','Press Arnold','Elevaciones Laterales','Elevaciones Frontales','Press de Banca','Press Inclinado','Fondos'],
+    rodilla:['Sentadilla','Zancada','Prensa','Hack Squat','Extensión de Cuádriceps','Sentadilla Búlgara','Sentadilla Sumo','Sentadilla Frontal'],
+    espalda_baja:['Peso Muerto','Remo con Barra','Sentadilla con Barra'],
+    muneca:['Curl con Barra','Press de Banca','Flexiones'],
+    cuello:['Press Militar','Encogimientos'],
+    codo:['Curl','Extensión','Jalón de Tríceps','Rompecráneos','Fondos']
+  };
+  function filterInjuries(exercises){
+    if(!injuries.length)return exercises;
+    return exercises.filter(ex=>{
+      return !injuries.some(inj=>{
+        const banned=injuryBlacklist[inj]||[];
+        return banned.some(b=>ex.name.includes(b));
+      });
+    });
+  }
+
+  // ═══ WIZARD DATA: Style override for chooseSplit ═══
+  const wizStyle=wizData?.style||'auto';
+
+  // ═══ WIZARD DATA: Preferred exercises injection ═══
+  const prefs=wizData?.preferences||[];
+  const prefExercises=[];
+  if(prefs.includes('dominadas')) prefExercises.push(EX.espalda_compound.find(e=>e.name.includes('Dominada')));
+  if(prefs.includes('sentadilla')) prefExercises.push(EX.piernas_compound.find(e=>e.name.includes('Sentadilla con Barra')));
+  if(prefs.includes('peso_muerto')) prefExercises.push(EX.espalda_isolation.find(e=>e.name.includes('Convencional')));
+  if(prefs.includes('press_banca')) prefExercises.push(EX.pecho_compound.find(e=>e.name.includes('Press de Banca')));
+  if(prefs.includes('hip_thrust')) prefExercises.push(EX.gluteos_compound.find(e=>e.name.includes('Hip Thrust')));
+
   const splitKeys=chooseSplit(days.length);
 
   return days.map((dayName,i)=>{
     const key=splitKeys[i%splitKeys.length];
     const sess=buildSession(key);
+    
+    // Apply equipment filtering
+    sess.exercises=filterEquip(sess.exercises);
+    
+    // Apply injury filtering
+    sess.exercises=filterInjuries(sess.exercises);
+    
+    // Inject preferred exercises if they fit the session's muscles
+    prefExercises.filter(Boolean).forEach(pex=>{
+      const fits=sess.muscles.some(m=>pex.muscle.includes(m)||m.includes(pex.muscle))||sess.muscles.includes('Full Body');
+      const alreadyIn=sess.exercises.some(e=>e.name===pex.name);
+      if(fits&&!alreadyIn&&sess.exercises.length<7){
+        sess.exercises.splice(1,0,{...pex}); // insert after first exercise
+      }
+    });
+    
+    // Ensure minimum exercises
+    if(sess.exercises.length<3){
+      const fallbacks=[...pick(EX.core,1),...pick(EX.gluteos_isolation,1)];
+      sess.exercises.push(...fallbacks.slice(0,3-sess.exercises.length));
+    }
+    
     // Apply level & goal mods
     sess.exercises.forEach(ex=>{
       ex.sets=Math.max(2,Math.min(6,ex.sets+gmod.sets+lmod.setsMod));
@@ -2185,7 +2292,6 @@ function saveSession(){
   const w=plan[curWkIdx];
   // Use elapsed time, fallback to plan duration if session was never started
   const dur=sessAccum>0 ? Math.max(1,Math.round(sessAccum/60000)) : (w.duration||45);
-  const kcal=calcKcal(w,dur);
 
   // Include ALL exercises: completed ones with real values, not-started ones skipped
   // Even if 0 exercises done, still save the session (user may have trained without tracking)
@@ -2210,6 +2316,7 @@ function saveSession(){
   }));
 
   const totalVol=exFinal.reduce((a,e)=>a+e.sets*e.reps*(e.weight||0),0);
+  const kcal=calcKcal(w,dur,exFinal);
   const entry={
     id:Date.now(),date:new Date().toISOString(),
     workoutName:w.name,day:w.day,duration:dur,kcal,
@@ -2219,9 +2326,60 @@ function saveSession(){
   storageSet('iq3_history',JSON.stringify(history));
   toast('🏁 '+dur+' min · '+kcal+' kcal guardados 🔥','ok');
 }
-function calcKcal(w,dur){
-  const met={volumen:6,definicion:7,fuerza:5,resistencia:8,perdida_peso:7,general:6};
-  return Math.round((met[profile?.goal]||6)*(profile?.weight||75)*(dur/60));
+function calcKcal(w,dur,exercisesDone){
+  // ── IMPROVED KCAL ESTIMATION ──
+  // Combines: base metabolic cost (MET) + actual mechanical work volume
+  // Reference: Strength training MET = 3.5-6.0 (ACSM Compendium of Physical Activities)
+  
+  const bodyWeight=profile?.weight||75;
+  const isFemale=profile?.gender==='femenino';
+  const age=profile?.age||30;
+  
+  // 1. Base MET for strength training (more conservative & accurate)
+  const metByGoal={volumen:5.0,definicion:5.5,fuerza:4.5,resistencia:6.0,perdida_peso:5.5,general:4.5};
+  const met=metByGoal[profile?.goal]||4.5;
+  
+  // 2. Base caloric burn from MET × weight × time
+  //    Formula: kcal = MET × weight(kg) × time(hours)
+  //    But MET already includes resting metabolism, so we subtract 1 MET for net cost
+  const netMET=met-1; // subtract resting metabolic rate
+  let baseKcal=netMET*bodyWeight*(dur/60);
+  
+  // 3. Volume bonus: add calories from actual mechanical work
+  //    Each kg lifted has a metabolic cost beyond the base MET
+  //    Approx 0.002-0.005 kcal per kg lifted (including eccentric + concentric)
+  const exData=exercisesDone||[];
+  const totalVolume=exData.reduce((a,e)=>{
+    const sets=e.sets||0;
+    const reps=e.reps||0;
+    const kg=e.weight||0;
+    return a+(sets*reps*kg);
+  },0);
+  const volumeBonus=totalVolume*0.003; // ~0.003 kcal per kg moved
+  
+  // 4. Intensity multiplier based on exercises completed vs planned
+  const plannedExCount=w.exercises?w.exercises.length:6;
+  const doneExCount=exData.filter(e=>e.sets>0).length;
+  const completionRatio=plannedExCount>0?Math.min(1,doneExCount/plannedExCount):0.7;
+  // If user didn't track exercises (doneExCount=0), assume 70% completion
+  const intensityMul=doneExCount>0?Math.max(0.3,completionRatio):0.7;
+  
+  // 5. Gender adjustment: women burn ~10-15% less due to average lower muscle mass
+  const genderMul=isFemale?0.88:1.0;
+  
+  // 6. Age adjustment: metabolism decreases ~2% per decade after 20
+  const ageMul=Math.max(0.8, 1-((Math.max(20,age)-20)*0.002));
+  
+  // 7. Final calculation
+  let total=(baseKcal*intensityMul + volumeBonus)*genderMul*ageMul;
+  
+  // 8. Sanity bounds: strength session = typically 150-500 kcal
+  //    Minimum: ~2.5 kcal/min (very light), Maximum: ~10 kcal/min (extreme HIIT)
+  const minKcal=Math.round(dur*2.5);
+  const maxKcal=Math.round(dur*9);
+  total=Math.max(minKcal,Math.min(maxKcal,total));
+  
+  return Math.round(total);
 }
 
 // ── EXERCISE MODAL with STATIC ILLUSTRATIONS ──
@@ -2742,10 +2900,12 @@ function renderHistory(){
 }
 function calcStreak(){
   if(!history.length)return 0;
+  function toLocalDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  const histDates=new Set(history.map(e=>toLocalDS(new Date(e.date))));
   let streak=0;const today=new Date();today.setHours(0,0,0,0);let check=new Date(today);
   for(let i=0;i<365;i++){
-    const ds=check.toISOString().split('T')[0];
-    if(history.some(e=>e.date.startsWith(ds))){streak++;check.setDate(check.getDate()-1);}
+    const ds=toLocalDS(check);
+    if(histDates.has(ds)){streak++;check.setDate(check.getDate()-1);}
     else if(i===0){check.setDate(check.getDate()-1);}
     else break;
   }
@@ -2755,17 +2915,30 @@ function renderBarChart(){
   const el=document.getElementById('h-barchart');if(!el)return;
   const dayNames=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   const today=new Date();
+  // Use local date strings to avoid timezone issues with toISOString()
+  function toLocalDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   const days=Array.from({length:7},(_,i)=>{
     const d=new Date(today);d.setDate(d.getDate()-(6-i));d.setHours(0,0,0,0);
-    const ds=d.toISOString().split('T')[0];
-    const k=history.filter(e=>e.date.startsWith(ds)).reduce((a,e)=>a+e.kcal,0);
+    const ds=toLocalDS(d);
+    // Compare using local date of history entries too
+    const k=history.filter(e=>{const hd=new Date(e.date);return toLocalDS(hd)===ds;}).reduce((a,e)=>a+(e.kcal||0),0);
     return{lbl:dayNames[d.getDay()],kcal:k,today:i===6};
   });
-  const max=Math.max(...days.map(d=>d.kcal),300);
-  el.innerHTML=days.map(d=>`<div class="bar-col">
-    <div class="bar-fill ${d.today?'today':''}" style="height:${Math.max(4,(d.kcal/max)*72)}px"></div>
-    <div class="bar-day ${d.today?'today':''}">${d.lbl}</div>
-  </div>`).join('');
+  const max=Math.max(...days.map(d=>d.kcal),200);
+  const hasData=days.some(d=>d.kcal>0);
+  el.innerHTML=days.map(d=>{
+    const h=d.kcal>0?Math.max(8,(d.kcal/max)*68):4;
+    const valTxt=d.kcal>0?`<div style="font-size:9px;font-weight:800;color:${d.today?'var(--accent)':'var(--orange)'};margin-bottom:2px;font-family:'SF Mono','Menlo',monospace">${d.kcal}</div>`:'';
+    return`<div class="bar-col">
+      ${valTxt}
+      <div class="bar-fill ${d.today?'today':''}" style="height:${h}px"></div>
+      <div class="bar-day ${d.today?'today':''}">${d.lbl}</div>
+    </div>`;
+  }).join('');
+  if(!hasData){
+    el.innerHTML+=`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;font-weight:700;pointer-events:none">Completa entrenamientos para ver tu progreso</div>`;
+    el.style.position='relative';
+  }
 }
 function renderMiniCal(){
   const el=document.getElementById('h-calgrid');
@@ -2773,7 +2946,8 @@ function renderMiniCal(){
   const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const y=calViewDate.getFullYear(),m=calViewDate.getMonth();
   lbl.textContent=`${months[m]} ${y}`;
-  const workoutDates=new Set(history.map(e=>e.date.split('T')[0]));
+  function toLocalDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  const workoutDates=new Set(history.map(e=>toLocalDS(new Date(e.date))));
   const today=new Date();today.setHours(0,0,0,0);
   const firstDay=new Date(y,m,1).getDay(),daysInMonth=new Date(y,m+1,0).getDate();
   const dayLbls=['D','L','M','X','J','V','S'];
@@ -2781,7 +2955,7 @@ function renderMiniCal(){
   for(let i=0;i<firstDay;i++)h+='<div></div>';
   for(let d=1;d<=daysInMonth;d++){
     const dt=new Date(y,m,d);dt.setHours(0,0,0,0);
-    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const ds=toLocalDS(dt);
     const hw=workoutDates.has(ds),it=dt.getTime()===today.getTime();
     h+=`<div class="cday ${hw?'workout':''} ${it?'today':''}">${d}</div>`;
   }
