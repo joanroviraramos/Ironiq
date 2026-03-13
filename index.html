@@ -11,7 +11,7 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title>IRONIQ</title>
+<title>GND</title>
 <style>
 /* Embedded font fallbacks — no external requests */
 :root{
@@ -123,6 +123,8 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 .pg{display:none;animation:pgIn .22s ease}
 .pg.on{display:block}
 @keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
 .pi{padding:16px 14px 24px}
 
 /* ── SECTION TITLE ── */
@@ -356,29 +358,16 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 
 /* ── EXERCISE ILLUSTRATION ── */
 .ex-illus-wrap{
-  background:linear-gradient(180deg,#0a0a14 0%,#0f0f1e 100%);
+  background:#0d0d14;
   border-bottom:1px solid var(--border);
-  height:280px;display:flex;align-items:center;justify-content:center;
+  height:auto;min-height:180px;display:flex;align-items:center;justify-content:center;
   position:relative;overflow:hidden;flex-shrink:0
 }
-.ex-illus-wrap::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(79,163,255,.06),transparent);
-}
 .ex-illus-wrap svg{width:100%;height:260px;max-width:430px}
-.ex-gif{
-  width:100%;height:100%;object-fit:contain;
-  border-radius:0;position:absolute;inset:0;z-index:1;padding:8px;box-sizing:border-box;
-}
 .ex-gif-loading{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.5px;
-  height:100%;width:100%;position:absolute;inset:0;
-}
-.ex-gif-spinner{
-  width:36px;height:36px;border:3px solid var(--border2);
-  border-top-color:var(--accent);border-radius:50%;
-  animation:spin .8s linear infinite;
+  width:100%;padding:16px;box-sizing:border-box;background:transparent;
 }
 .muscle-tag-row{display:flex;gap:6px;padding:10px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
 .mtag{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.3px}
@@ -790,20 +779,67 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 <!-- LOADER -->
 <div id="loader">
   <div class="ld-logo">
-    <svg class="ld-icon" width="80" height="80" viewBox="0 0 80 80" fill="none">
-      <!-- Dumbbell body -->
-      <rect x="3" y="32" width="12" height="16" rx="4" fill="#4fa3ff"/>
-      <rect x="10" y="27" width="8" height="26" rx="3" fill="#4fa3ff"/>
-      <rect x="18" y="35" width="44" height="10" rx="3" fill="#c8c8e0"/>
-      <rect x="62" y="27" width="8" height="26" rx="3" fill="#f5ff50"/>
-      <rect x="65" y="32" width="12" height="16" rx="4" fill="#f5ff50"/>
-      <!-- Sweat drop -->
-      <path d="M40 12 C40 12 33 20 33 25 C33 28.9 36.1 32 40 32 C43.9 32 47 28.9 47 25 C47 20 40 12 40 12Z" fill="rgba(79,163,255,.7)"/>
-      <!-- Stars -->
-      <text x="22" y="20" font-size="11" fill="var(--accent)" opacity=".8">✦</text>
-      <text x="52" y="22" font-size="9" fill="var(--accent)" opacity=".6">✦</text>
+    <svg class="ld-icon" width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Glow background -->
+      <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#cc2020" stop-opacity=".25"/><stop offset="100%" stop-color="#cc2020" stop-opacity="0"/></radialGradient>
+      <circle cx="50" cy="50" r="48" fill="url(#glow)"/>
+      <!-- Left horn -->
+      <path d="M32 28 C26 18 20 10 24 4 C26 10 29 16 33 22Z" fill="#cc2020"/>
+      <path d="M33 22 C29 16 27 10 24 4 C30 6 36 14 36 22Z" fill="#991010"/>
+      <!-- Right horn -->
+      <path d="M68 28 C74 18 80 10 76 4 C74 10 71 16 67 22Z" fill="#cc2020"/>
+      <path d="M67 22 C71 16 73 10 76 4 C70 6 64 14 64 22Z" fill="#991010"/>
+      <!-- Neck -->
+      <path d="M40 46 C38 42 38 36 42 32 L50 30 L58 32 C62 36 62 42 60 46Z" fill="#2a2a38"/>
+      <!-- Head -->
+      <ellipse cx="50" cy="30" rx="14" ry="13" fill="#2a2a38"/>
+      <!-- Face shading -->
+      <ellipse cx="50" cy="33" rx="10" ry="9" fill="#22222f"/>
+      <!-- Eyes -->
+      <ellipse cx="44" cy="27" rx="3" ry="2.5" fill="#111"/>
+      <ellipse cx="56" cy="27" rx="3" ry="2.5" fill="#111"/>
+      <circle cx="44" cy="27" r="1.2" fill="#1a1a2e"/>
+      <circle cx="56" cy="27" r="1.2" fill="#1a1a2e"/>
+      <!-- Eye highlight -->
+      <circle cx="45" cy="26.2" r=".6" fill="#666"/>
+      <circle cx="57" cy="26.2" r=".6" fill="#666"/>
+      <!-- Snout -->
+      <ellipse cx="50" cy="35" rx="6" ry="4" fill="#1e1e2c"/>
+      <ellipse cx="47.5" cy="34.5" rx="1.5" ry="1.2" fill="#111"/>
+      <ellipse cx="52.5" cy="34.5" rx="1.5" ry="1.2" fill="#111"/>
+      <!-- Beard -->
+      <path d="M45 38 C45 42 47 44 50 44 C53 44 55 42 55 38" fill="#1a1a28"/>
+      <!-- Torso - massive chest -->
+      <path d="M28 48 C24 52 22 60 24 72 L76 72 C78 60 76 52 72 48 C66 44 56 42 50 42 C44 42 34 44 28 48Z" fill="#252533"/>
+      <!-- Chest definition -->
+      <path d="M50 48 C44 48 36 52 35 60 C40 58 45 57 50 57 C55 57 60 58 65 60 C64 52 56 48 50 48Z" fill="#1e1e2c"/>
+      <!-- Pecs split -->
+      <line x1="50" y1="48" x2="50" y2="62" stroke="#181824" stroke-width="1.5"/>
+      <!-- Left arm - massive, crossed -->
+      <path d="M28 48 C20 46 12 50 10 58 C12 64 18 68 26 66 C28 62 30 56 28 48Z" fill="#252533"/>
+      <!-- Left forearm crossing -->
+      <path d="M10 60 C14 68 24 72 34 70 C38 68 40 64 38 60 C32 62 20 62 10 60Z" fill="#2a2a3a"/>
+      <!-- Left bicep peak -->
+      <path d="M12 52 C10 56 10 60 12 62 C16 60 18 56 16 52Z" fill="#1e1e2c"/>
+      <!-- Right arm - massive, crossed -->
+      <path d="M72 48 C80 46 88 50 90 58 C88 64 82 68 74 66 C72 62 70 56 72 48Z" fill="#252533"/>
+      <!-- Right forearm crossing -->
+      <path d="M90 60 C86 68 76 72 66 70 C62 68 60 64 62 60 C68 62 80 62 90 60Z" fill="#2a2a3a"/>
+      <!-- Right bicep peak -->
+      <path d="M88 52 C90 56 90 60 88 62 C84 60 82 56 84 52Z" fill="#1e1e2c"/>
+      <!-- Crossed arms detail -->
+      <path d="M38 60 C42 64 50 66 60 64 C64 62 66 60 64 58 C58 60 44 60 38 60Z" fill="#2e2e40"/>
+      <!-- Muscle definition lines -->
+      <path d="M36 52 C34 56 33 60 34 64" stroke="#1a1a28" stroke-width="1" fill="none" opacity=".6"/>
+      <path d="M64 52 C66 56 67 60 66 64" stroke="#1a1a28" stroke-width="1" fill="none" opacity=".6"/>
+      <!-- Ear left -->
+      <ellipse cx="35" cy="28" rx="4" ry="5" fill="#22222f" transform="rotate(-15 35 28)"/>
+      <ellipse cx="35" cy="28" rx="2.2" ry="3" fill="#1a1a26" transform="rotate(-15 35 28)"/>
+      <!-- Ear right -->
+      <ellipse cx="65" cy="28" rx="4" ry="5" fill="#22222f" transform="rotate(15 65 28)"/>
+      <ellipse cx="65" cy="28" rx="2.2" ry="3" fill="#1a1a26" transform="rotate(15 65 28)"/>
     </svg>
-    <div class="ld-name">IRON<span>IQ</span></div>
+    <div class="ld-name">GN<span>D</span></div>
     <div class="ld-sub">Entrena más inteligente</div>
   </div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
@@ -812,14 +848,36 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 <!-- ONBOARDING -->
 <div id="pg-onboard" style="display:none">
   <div style="text-align:center">
-    <svg width="72" height="72" viewBox="0 0 80 80" fill="none" style="margin-bottom:8px">
-      <rect x="3" y="32" width="12" height="16" rx="4" fill="#4fa3ff"/>
-      <rect x="10" y="27" width="8" height="26" rx="3" fill="#4fa3ff"/>
-      <rect x="18" y="35" width="44" height="10" rx="3" fill="#c8c8e0"/>
-      <rect x="62" y="27" width="8" height="26" rx="3" fill="#f5ff50"/>
-      <rect x="65" y="32" width="12" height="16" rx="4" fill="#f5ff50"/>
+    <svg width="72" height="72" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:8px">
+      <radialGradient id="glow2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#cc2020" stop-opacity=".2"/><stop offset="100%" stop-color="#cc2020" stop-opacity="0"/></radialGradient>
+      <circle cx="50" cy="50" r="48" fill="url(#glow2)"/>
+      <path d="M32 28 C26 18 20 10 24 4 C26 10 29 16 33 22Z" fill="#cc2020"/>
+      <path d="M33 22 C29 16 27 10 24 4 C30 6 36 14 36 22Z" fill="#991010"/>
+      <path d="M68 28 C74 18 80 10 76 4 C74 10 71 16 67 22Z" fill="#cc2020"/>
+      <path d="M67 22 C71 16 73 10 76 4 C70 6 64 14 64 22Z" fill="#991010"/>
+      <path d="M40 46 C38 42 38 36 42 32 L50 30 L58 32 C62 36 62 42 60 46Z" fill="#2a2a38"/>
+      <ellipse cx="50" cy="30" rx="14" ry="13" fill="#2a2a38"/>
+      <ellipse cx="50" cy="33" rx="10" ry="9" fill="#22222f"/>
+      <ellipse cx="44" cy="27" rx="3" ry="2.5" fill="#111"/>
+      <ellipse cx="56" cy="27" rx="3" ry="2.5" fill="#111"/>
+      <circle cx="45" cy="26.2" r=".6" fill="#666"/>
+      <circle cx="57" cy="26.2" r=".6" fill="#666"/>
+      <ellipse cx="50" cy="35" rx="6" ry="4" fill="#1e1e2c"/>
+      <ellipse cx="47.5" cy="34.5" rx="1.5" ry="1.2" fill="#111"/>
+      <ellipse cx="52.5" cy="34.5" rx="1.5" ry="1.2" fill="#111"/>
+      <path d="M45 38 C45 42 47 44 50 44 C53 44 55 42 55 38" fill="#1a1a28"/>
+      <path d="M28 48 C24 52 22 60 24 72 L76 72 C78 60 76 52 72 48 C66 44 56 42 50 42 C44 42 34 44 28 48Z" fill="#252533"/>
+      <path d="M50 48 C44 48 36 52 35 60 C40 58 45 57 50 57 C55 57 60 58 65 60 C64 52 56 48 50 48Z" fill="#1e1e2c"/>
+      <line x1="50" y1="48" x2="50" y2="62" stroke="#181824" stroke-width="1.5"/>
+      <path d="M28 48 C20 46 12 50 10 58 C12 64 18 68 26 66 C28 62 30 56 28 48Z" fill="#252533"/>
+      <path d="M10 60 C14 68 24 72 34 70 C38 68 40 64 38 60 C32 62 20 62 10 60Z" fill="#2a2a3a"/>
+      <path d="M72 48 C80 46 88 50 90 58 C88 64 82 68 74 66 C72 62 70 56 72 48Z" fill="#252533"/>
+      <path d="M90 60 C86 68 76 72 66 70 C62 68 60 64 62 60 C68 62 80 62 90 60Z" fill="#2a2a3a"/>
+      <path d="M38 60 C42 64 50 66 60 64 C64 62 66 60 64 58 C58 60 44 60 38 60Z" fill="#2e2e40"/>
+      <ellipse cx="35" cy="28" rx="4" ry="5" fill="#22222f" transform="rotate(-15 35 28)"/>
+      <ellipse cx="65" cy="28" rx="4" ry="5" fill="#22222f" transform="rotate(15 65 28)"/>
     </svg>
-    <div class="ob-logo">IRON<span>IQ</span></div>
+    <div class="ob-logo">GN<span>D</span></div>
     <div class="ob-tagline">Tu entrenador personal IA</div>
   </div>
   <div class="ob-prog" id="ob-prog">
@@ -893,14 +951,28 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
   <!-- TOP BAR -->
   <div id="topbar">
     <div class="tb-logo" onclick="goPage('home')">
-      <svg width="32" height="32" viewBox="0 0 80 80" fill="none">
-        <rect x="3" y="32" width="12" height="16" rx="4" fill="#4fa3ff"/>
-        <rect x="10" y="27" width="8" height="26" rx="3" fill="#4fa3ff"/>
-        <rect x="18" y="35" width="44" height="10" rx="3" fill="#c8c8e0"/>
-        <rect x="62" y="27" width="8" height="26" rx="3" fill="#f5ff50"/>
-        <rect x="65" y="32" width="12" height="16" rx="4" fill="#f5ff50"/>
+      <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 28 C26 18 20 10 24 4 C26 10 29 16 33 22Z" fill="#cc2020"/>
+        <path d="M33 22 C29 16 27 10 24 4 C30 6 36 14 36 22Z" fill="#991010"/>
+        <path d="M68 28 C74 18 80 10 76 4 C74 10 71 16 67 22Z" fill="#cc2020"/>
+        <path d="M67 22 C71 16 73 10 76 4 C70 6 64 14 64 22Z" fill="#991010"/>
+        <path d="M40 46 C38 42 38 36 42 32 L50 30 L58 32 C62 36 62 42 60 46Z" fill="#2a2a38"/>
+        <ellipse cx="50" cy="30" rx="14" ry="13" fill="#2a2a38"/>
+        <ellipse cx="50" cy="33" rx="10" ry="9" fill="#22222f"/>
+        <ellipse cx="44" cy="27" rx="3" ry="2.5" fill="#111"/>
+        <ellipse cx="56" cy="27" rx="3" ry="2.5" fill="#111"/>
+        <circle cx="45" cy="26.2" r=".6" fill="#666"/>
+        <circle cx="57" cy="26.2" r=".6" fill="#666"/>
+        <ellipse cx="50" cy="35" rx="6" ry="4" fill="#1e1e2c"/>
+        <path d="M28 48 C24 52 22 60 24 72 L76 72 C78 60 76 52 72 48 C66 44 56 42 50 42 C44 42 34 44 28 48Z" fill="#252533"/>
+        <path d="M28 48 C20 46 12 50 10 58 C12 64 18 68 26 66 C28 62 30 56 28 48Z" fill="#252533"/>
+        <path d="M10 60 C14 68 24 72 34 70 C38 68 40 64 38 60 C32 62 20 62 10 60Z" fill="#2a2a3a"/>
+        <path d="M72 48 C80 46 88 50 90 58 C88 64 82 68 74 66 C72 62 70 56 72 48Z" fill="#252533"/>
+        <path d="M90 60 C86 68 76 72 66 70 C62 68 60 64 62 60 C68 62 80 62 90 60Z" fill="#2a2a3a"/>
+        <ellipse cx="35" cy="28" rx="4" ry="5" fill="#22222f" transform="rotate(-15 35 28)"/>
+        <ellipse cx="65" cy="28" rx="4" ry="5" fill="#22222f" transform="rotate(15 65 28)"/>
       </svg>
-      <span class="tb-logoname">IRON<span>IQ</span></span>
+      <span class="tb-logoname">GN<span>D</span></span>
     </div>
     <button class="tb-avatar" id="nav-av" onclick="goPage('profile')">J</button>
   </div>
@@ -1061,7 +1133,7 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
     <div class="mini-cal" id="prof-muscles" style="padding:16px"></div>
     <div class="stitle">ENTRENADOR IA</div>
     <div class="prof-chat-w">
-      <div class="prof-chat-hd"><div class="ai-pulse"></div>Chat con IRONIQ</div>
+      <div class="prof-chat-hd"><div class="ai-pulse"></div>Chat con GND</div>
       <div class="chat-body" id="prof-msgs" style="height:220px"></div>
       <div class="chat-inp-row">
         <input class="chat-inp" id="prof-inp" placeholder="¿Qué debo comer antes de entrenar?" onkeydown="if(event.key==='Enter')sendChat()">
@@ -1084,11 +1156,7 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
       <div class="ex-illus-wrap" id="ex-illus-wrap">
-        <div class="ex-gif-loading" id="ex-gif-loading">
-          <div class="ex-gif-spinner"></div>
-          <span>Cargando ejercicio...</span>
-        </div>
-        <img class="ex-gif" id="ex-gif" src="" alt="" style="display:none" onload="document.getElementById('ex-gif-loading').style.display='none';this.style.display='block'" onerror="showGifFallback()">
+        <div class="ex-gif-loading" id="ex-gif-loading" style="display:flex;align-items:center;justify-content:center;"></div>
       </div>
       <div class="muscle-tag-row" id="mel-tags"></div>
       <div class="series-sec">
@@ -1324,7 +1392,7 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 
 <script>
 // ═══════════════════════════════════════════
-// IRONIQ v3 — Complete App
+// GND v1 — Complete App
 // ═══════════════════════════════════════════
 const MDL = 'claude-sonnet-4-20250514';
 
@@ -1607,49 +1675,103 @@ async function generatePlan(){
   const gmap={volumen:'ganar músculo e hipertrofia',definicion:'definición y pérdida de grasa',fuerza:'fuerza máxima',resistencia:'resistencia muscular',perdida_peso:'perder peso',general:'fitness general'};
   const priMap={pecho:'pecho',espalda:'espalda ancha y gruesa',hombros:'hombros redondos y anchos',brazos:'bíceps y tríceps grandes',gluteos:'glúteos fuertes y voluminosos',piernas:'piernas potentes (cuádriceps e isquios)',core:'abdominales definidos y core fuerte',todo:'desarrollo equilibrado'};
   const styleMap={push_pull:'Push/Pull/Legs',antagonista:'Músculos antagonistas (ej: pecho+espalda)',torso_pierna:'Torso/Pierna',fullbody:'Full Body cada día',weider:'Un grupo muscular principal por día',auto:'el split que mejor se adapte al objetivo y número de días'};
-  const equipMap={gym:'gimnasio completo (barras, mancuernas, poleas, máquinas)',basic:'gimnasio básico (barras, mancuernas, banco, polea)',minimal:'peso corporal y bandas elásticas solamente',home_db:'casa con mancuernas y banco ajustable'};
+  const equipMap={gym:'Gimnasio GND con máquinas Etenon Fitness profesionales (prensa piernas, hack squat, jalón dorsal, remo sentado, press pecho, pec deck, curl bíceps, extensión tríceps, femoral, extensión cuádriceps, abductor/adductor, gemelo, press hombros, poleas altas y bajas, Smith)',basic:'gimnasio básico (barras, mancuernas, banco, polea)',minimal:'peso corporal y bandas elásticas solamente',home_db:'casa con mancuernas y banco ajustable'};
 
   const priorities=wizData.priorities.filter(p=>p!=='todo').map(p=>priMap[p]||p).join(', ')||'desarrollo equilibrado de todo el cuerpo';
   const injuryList=wizData.injuries.filter(p=>p!=='ninguna');
-  const injTxt=injuryList.length?`\nLESIONES: ${injuryList.join(', ')}. OBLIGATORIO: evita o sustituye ejercicios que carguen estas zonas. Usa alternativas seguras.`:'';
-  const prefTxt=wizData.preferences.length?`\nEJERCICIOS FAVORITOS: ${wizData.preferences.join(', ')}. Inclúyelos si encajan con el plan.`:'';
+
+  // FIX: Lesiones → instrucción específica de usar máquinas guiadas
+  const injTxt=injuryList.length
+    ?`\nLESIONES ACTIVAS: ${injuryList.join(', ')}.
+- OBLIGATORIO: NO incluyas ejercicios con carga libre que comprometan estas zonas
+- USA MÁQUINAS GUIADAS como alternativa segura: para rodilla→prensa/extensión en máquina en vez de sentadilla libre; para lumbar→jalón/remo en máquina en vez de peso muerto con barra; para hombro→press en máquina en vez de press libre; para muñeca/codo→máquinas con agarre neutro
+- Indica en los tips cómo adaptar la ejecución a la lesión`:''  ;
+
+  // FIX: Preferencias — si prefiere máquinas, instrucción explícita
+  const prefMaquinas=wizData.preferences.includes('maquinas');
+  const prefPoleas=wizData.preferences.includes('poleas');
+  const otherPrefs=wizData.preferences.filter(p=>p!=='maquinas'&&p!=='poleas');
+  let prefTxt='';
+  if(prefMaquinas) prefTxt+=`\nPREFERENCIA MÁQUINAS: Este usuario PREFIERE MÁQUINAS sobre peso libre. USA máquinas Etenon para TODOS los ejercicios posibles. Solo usa barras/mancuernas cuando no haya alternativa en máquina.`;
+  if(prefPoleas) prefTxt+=`\nPREFERENCIA POLEAS: Incluye ejercicios de polea (cruces, jalones, remos en polea, extensiones, curl en polea).`;
+  if(otherPrefs.length) prefTxt+=`\nEJERCICIOS FAVORITOS: ${otherPrefs.join(', ')}. Inclúyelos si encajan con el plan.`;
+
   const notesTxt=wizData.notes?`\nNOTAS DEL USUARIO: "${wizData.notes}"`:'';
 
   const isFemale=profile.gender==='femenino';
   const genderTxt=isFemale?'mujer':'hombre';
+
+  // FIX: Validación coherencia días ↔ estilo
+  const nDays=profile.days.length;
+  let styleFixed=wizData.style;
+  let styleWarning='';
+  if(styleFixed==='push_pull'&&nDays<3){styleFixed='fullbody';styleWarning='\n⚠️ Push/Pull/Legs requiere 3+ días — cambiado automáticamente a Full Body.';}
+  if(styleFixed==='weider'&&nDays<4){styleFixed='torso_pierna';styleWarning='\n⚠️ Weider requiere 4+ días — cambiado automáticamente a Torso/Pierna.';}
+  if(styleFixed==='torso_pierna'&&nDays<4){styleFixed='fullbody';styleWarning='\n⚠️ Torso/Pierna requiere 4+ días — cambiado automáticamente a Full Body.';}
+  if(styleFixed==='antagonista'&&nDays<3){styleFixed='fullbody';styleWarning='\n⚠️ Antagonista requiere 3+ días — cambiado automáticamente a Full Body.';}
+
+  // FIX: Nivel principiante — restricciones
+  const levelTxt=profile.level==='principiante'
+    ?`\nNIVEL PRINCIPIANTE: Evita ejercicios técnicamente complejos (peso muerto con barra, sentadilla olímpica, press banca pesado). Prioriza MÁQUINAS GUIADAS que enseñan el patrón de movimiento. Rangos altos de reps (12-15) con pesos moderados.`
+    :profile.level==='avanzado'
+    ?`\nNIVEL AVANZADO: Puedes incluir ejercicios compuestos pesados, técnicas avanzadas (superseries, drop sets). Rangos 6-8 en compuestos principales.`
+    :'';
+
   const genderHints=isFemale
     ?`\nADAPTACIÓN POR GÉNERO (MUJER):
-- Las mujeres típicamente priorizan más tren inferior (glúteos, piernas) y menos tren superior que los hombres
-- Incluye más ejercicios de activación de glúteo (hip thrust, puente de glúteos, patada trasera, abducción)
-- Ajusta pesos: tren superior suele ser ~40-50% del peso corporal en compuestos, tren inferior ~60-80%
-- Los rangos de 10-15 reps son generalmente más efectivos para hipertrofia en mujeres
-- Incluye más trabajo de isquiotibiales y glúteo medio (abducción, caminata con banda)
-- Menos énfasis en pecho/tríceps aislado salvo que lo pida específicamente`
+- Más tren inferior: glúteos, isquios, abductores
+- Ejercicios clave: hip thrust en máquina, prensa, extensión femoral, abductor/adductor, curl femoral
+- Rangos 10-15 reps, pesos tren superior ~40% peso corporal, tren inferior ~60-80%
+- Menos énfasis en pecho/tríceps aislado salvo que lo pida
+- Activación de glúteo medio: abducción en máquina, patada trasera en polea`
     :`\nADAPTACIÓN POR GÉNERO (HOMBRE):
-- Los hombres suelen beneficiarse de más volumen en tren superior (pecho, espalda, hombros)
-- Rangos de 6-12 reps para hipertrofia, más peso relativo en compuestos
-- Incluir trabajo de brazos (bíceps/tríceps) como accesorio habitual`;
+- Más volumen tren superior: pecho, espalda, hombros, brazos
+- Rangos 6-12 reps en compuestos, más peso relativo
+- Bíceps/tríceps como accesorios habituales`;
 
-  const prompt=`Eres un entrenador personal de ÉLITE con 20 años de experiencia. Crea un plan semanal 100% PERSONALIZADO.
+  // FIX: Instrucción maestra de máquinas Etenon (siempre presente si gym)
+  const etenon=wizData.equipment==='gym'
+    ?`\nGIMNASIO GND — MÁQUINAS ETENON FITNESS:
+El gimnasio dispone de máquinas profesionales Etenon. REGLA PRINCIPAL: PRIORIZA SIEMPRE ejercicios en máquina sobre peso libre. Ejemplos de sustitución obligatoria:
+• Sentadilla libre → Prensa de piernas o Hack Squat Etenon
+• Peso muerto barra → Curl femoral + extensión en máquina Etenon
+• Press banca barra → Press pecho en máquina Etenon o Smith
+• Remo barra → Remo sentado en máquina Etenon
+• Dominadas → Jalón dorsal en máquina Etenon
+• Press militar barra → Press hombros en máquina Etenon
+• Curl bíceps barra → Curl bíceps en máquina Etenon
+• Extensión tríceps → Extensión tríceps en máquina Etenon
+Solo usa peso libre (barras/mancuernas) cuando el ejercicio no tenga equivalente en máquina o el usuario lo prefiera específicamente.`
+    :'';
+
+  const prompt=`Eres un entrenador personal de ÉLITE especializado en gimnasios con equipamiento Etenon Fitness. Crea un plan semanal 100% PERSONALIZADO.
 
 PERFIL: ${profile.name}, ${genderTxt}, ${profile.age} años, ${profile.weight}kg, ${profile.height}cm, nivel ${profile.level}.
 OBJETIVO PRINCIPAL: ${gmap[profile.goal]||profile.goal}.
-DÍAS DE ENTRENAMIENTO: ${profile.days.length} días (${profile.days.join(', ')}).
+DÍAS DE ENTRENAMIENTO: ${nDays} días (${profile.days.join(', ')}).
 PRIORIDADES MUSCULARES: Enfoque especial en ${priorities}. Dedica MÁS ejercicios y volumen a estas zonas.
-ESTILO DE ENTRENAMIENTO: ${styleMap[wizData.style]||'elige el mejor split'}.
-EQUIPAMIENTO DISPONIBLE: ${equipMap[wizData.equipment]||'gimnasio completo'}.${prefTxt}${injTxt}${notesTxt}${genderHints}
+ESTILO DE ENTRENAMIENTO: ${styleMap[styleFixed]||'elige el mejor split'}.${styleWarning}
+EQUIPAMIENTO: ${equipMap[wizData.equipment]||'gimnasio completo'}.${etenon}${prefTxt}${injTxt}${notesTxt}${levelTxt}${genderHints}
 
 REGLAS DE ENTRENADOR EXPERTO:
 - EL PLAN DEBE SER DIFERENTE según género, prioridades y objetivo. NO uses la misma plantilla genérica para todos.
-- Si prioriza glúteos: mínimo 2 días con trabajo directo de glúteos (hip thrust, sentadilla búlgara, kickback en polea, abducción, puente de glúteos, peso muerto sumo)
-- Si prioriza pecho: mínimo 2 días con trabajo directo de pecho variado (ángulos diferentes)
+- Si prioriza glúteos: mínimo 2 días con hip thrust en máquina, prensa con pies altos, curl femoral, abductor/adductor Etenon
+- Si prioriza pecho: mínimo 2 días con press en máquina, pec deck, cruces en polea con ángulos distintos
+- Si prioriza espalda: jalón dorsal, remo sentado en máquina, polea baja con distintos agarres
 - Zonas prioritarias: 2-3 ejercicios extra vs zonas normales
-- Compuestos SIEMPRE primero, aislamiento al final
-- Pesos realistas para ${genderTxt} de ${profile.weight}kg, nivel ${profile.level} (no inflados)
-- 5-7 ejercicios/sesión, 3-5 series según compuesto/aislamiento
-- Descanso: 90-120s compuestos pesados, 60-90s aislamiento
-- 3 tips técnicos ESPECÍFICOS y ÚTILES por ejercicio (no genéricos)
-- Nombres de sesión creativos y motivadores${injuryList.length?'\n- CRÍTICO: NO incluyas ejercicios que afecten a: '+injuryList.join(', ')+'. Usa alternativas seguras siempre.':''}
+- Compuestos/máquinas SIEMPRE primero, aislamiento al final
+- Pesos realistas para ${genderTxt} de ${profile.weight}kg, nivel ${profile.level}
+- 5-7 ejercicios/sesión
+- SERIES Y REPS OBLIGATORIOS según objetivo y nivel:
+  • Volumen/Hipertrofia → compuestos: 4 series × 8-10 reps | aislamiento: 3 series × 10-12 reps
+  • Fuerza → compuestos: 4-5 series × 3-6 reps | aislamiento: 3 series × 8-10 reps
+  • Definición/Pérdida peso → 3-4 series × 12-15 reps en todos
+  • Resistencia → 3 series × 15-20 reps en todos
+  • Principiante: SIEMPRE 3 series máximo, reps altas (10-15). Avanzado puede llegar a 5 series en compuestos.
+  NUNCA generes 2 series. El mínimo es 3 series.
+- Descanso entre series: fuerza→180-240s compuestos / hipertrofia→90-120s compuestos, 60s aislamiento / definición y resistencia→45-60s todo
+- 3 tips técnicos ESPECÍFICOS y ÚTILES por ejercicio (no genéricos, menciona ajustes de la máquina si aplica)
+- Nombres de sesión creativos y motivadores${injuryList.length?'\n- CRÍTICO: NO incluyas ejercicios que carguen: '+injuryList.join(', ')+'. Siempre alternativa en máquina guiada.':''}
 
 RESPONDE SOLO JSON (sin markdown, sin backticks, sin explicaciones):
 {"plan":[{"day":"Lunes","name":"NOMBRE CREATIVO","duration":65,"muscles":["M1","M2"],"exercises":[{"name":"Nombre Ejercicio","muscle":"Músculo","equipment":"Equipo","type":"bench_press","sets":4,"reps":"8-10","weight":"60","rest":"90s","tips":["tip técnico 1","tip técnico 2","tip técnico 3"]}]}]}
@@ -2004,11 +2126,52 @@ function generateLocalPlan(){
     return s;
   }
 
-  // Level adjustments
-  const levelMod={principiante:{weightMul:0.7,setsMod:-1},intermedio:{weightMul:1,setsMod:0},avanzado:{weightMul:1.15,setsMod:1}};
-  const goalMod={volumen:{sets:1,reps:0},definicion:{sets:0,reps:3},fuerza:{sets:1,reps:-2},resistencia:{sets:0,reps:5},perdida_peso:{sets:0,reps:3},general:{sets:0,reps:0}};
-  const lmod=levelMod[level]||{weightMul:1,setsMod:0};
-  const gmod=goalMod[goal]||{sets:0,reps:0};
+  // ── SETS & REPS TABLE (objetivo × nivel) ──
+  // Cada combinación define rangos correctos según ciencia del entrenamiento:
+  // Fuerza: 4-6 series × 3-6 reps / Hipertrofia: 3-5 × 8-12 / Resistencia: 3-4 × 15-20 / Definición: 3-4 × 12-15
+  const setsRepsTable = {
+    //              [setsCompuesto, setsAislamiento, repsCompuesto, repsAislamiento]
+    volumen: {
+      principiante: [3, 3, '8-10',  '10-12'],
+      intermedio:   [4, 3, '8-10',  '10-12'],
+      avanzado:     [5, 4, '6-10',  '10-12'],
+    },
+    fuerza: {
+      principiante: [3, 3, '6-8',   '10-12'],
+      intermedio:   [4, 3, '5-6',   '8-10'],
+      avanzado:     [5, 4, '3-5',   '6-8'],
+    },
+    definicion: {
+      principiante: [3, 3, '12-15', '12-15'],
+      intermedio:   [4, 3, '12-15', '15-20'],
+      avanzado:     [4, 4, '12-15', '15-20'],
+    },
+    resistencia: {
+      principiante: [3, 3, '15-20', '15-20'],
+      intermedio:   [3, 3, '15-20', '20-25'],
+      avanzado:     [4, 4, '15-20', '20-25'],
+    },
+    perdida_peso: {
+      principiante: [3, 3, '12-15', '15-20'],
+      intermedio:   [3, 3, '12-15', '15-20'],
+      avanzado:     [4, 4, '12-15', '15-20'],
+    },
+    general: {
+      principiante: [3, 3, '10-12', '12-15'],
+      intermedio:   [3, 3, '10-12', '12-15'],
+      avanzado:     [4, 3, '8-12',  '12-15'],
+    },
+  };
+
+  // COMPOUND exercises: bench_press, incline_press, pull_up, lat_pulldown, row, deadlift, rdl, shoulder_press, squat, lunge, leg_press, hip_thrust
+  const compoundTypes = new Set(['bench_press','incline_press','pull_up','lat_pulldown','row','deadlift','rdl','shoulder_press','squat','lunge','leg_press','hip_thrust']);
+
+  const srKey = goal in setsRepsTable ? goal : 'general';
+  const srLevel = level in setsRepsTable[srKey] ? level : 'intermedio';
+  const [setsC, setsI, repsC, repsI] = setsRepsTable[srKey][srLevel];
+
+  const levelMod={principiante:{weightMul:0.7},intermedio:{weightMul:1},avanzado:{weightMul:1.15}};
+  const lmod=levelMod[level]||{weightMul:1};
 
   // ═══ WIZARD DATA: Equipment filtering ═══
   const equip=wizData?.equipment||'gym';
@@ -2090,13 +2253,12 @@ function generateLocalPlan(){
       }
     }
     
-    // Apply level & goal mods
+    // Apply level & goal mods — usar tabla coherente en vez de deltas arbitrarios
     sess.exercises.forEach(ex=>{
-      ex.sets=Math.max(2,Math.min(6,ex.sets+gmod.sets+lmod.setsMod));
-      const baseReps=parseInt(String(ex.reps).split('-')[0])||10;
-      if(!String(ex.reps).includes('s')&&!String(ex.reps).includes('pasos')){
-        const newReps=Math.max(4,baseReps+gmod.reps);
-        ex.reps=`${newReps}-${newReps+2}`;
+      const isCompound = compoundTypes.has(ex.type);
+      ex.sets = isCompound ? setsC : setsI;
+      if(!String(ex.reps).includes('s') && !String(ex.reps).includes('pasos')){
+        ex.reps = isCompound ? repsC : repsI;
       }
       const baseW=parseFloat(ex.weight)||0;
       if(baseW>0)ex.weight=String(Math.round(baseW*lmod.weightMul/2.5)*2.5);
@@ -2452,318 +2614,336 @@ const MUSCLE_INFO={
   calf_raise:{pri:['Gemelo','Sóleo'],sec:['Tibial Anterior']},
 };
 
-// Static SVG illustrations — clean, flat, legible, no animation
+// ── EXERCISE ILLUSTRATIONS — Claude API genera SVGs anatómicos con músculo activado ──
 
-// ── EXERCISE ILLUSTRATIONS (inline SVG — no external fetch) ──
+// Cache en memoria (sesión) + localStorage (persistente)
+const _illusMemCache = {};
+const ILLUS_LS_PREFIX = 'gnd_illus_v2_';
 
-async function drawIllus(type, exName='') {
-  const gifEl  = document.getElementById('ex-gif');
+function _illusLsGet(key) {
+  try { const v = localStorage.getItem(ILLUS_LS_PREFIX + key); return v || null; } catch(e) { return null; }
+}
+function _illusLsSet(key, svg) {
+  try { localStorage.setItem(ILLUS_LS_PREFIX + key, svg); } catch(e) {}
+}
+
+async function _generateMuscleSVG(type, exName, muscles) {
+  const priMuscles = muscles.pri.join(', ');
+  const secMuscles = muscles.sec.join(', ');
+
+  const prompt = `Generate a clean anatomical SVG illustration of the human body for the exercise "${exName}".
+
+Requirements:
+- viewBox="0 0 200 320"
+- Dark background rectangle: fill="#0d0d14"
+- Draw a simplified but recognizable front-view human body silhouette using smooth paths. Include: head (circle), neck, torso, arms, forearms, hands, hips, thighs, calves, feet.
+- Body outline/base color: fill="#1e1e2e" stroke="#2a2a3e" stroke-width="1.5"
+- PRIMARY muscles activated (${priMuscles}): fill="#f5ff50" opacity="0.9" — draw these as highlighted regions ON TOP of the body with a subtle glow effect (filter or extra opacity layer)
+- SECONDARY muscles (${secMuscles}): fill="#f5ff50" opacity="0.35" — slightly highlighted
+- Add a small text label at bottom center: the primary muscle name in white, font-size="11" font-family="system-ui,sans-serif" font-weight="700" fill="white" opacity="0.7"
+- Keep it clean, minimalist, medical-illustration style
+- The body should be centered and fill most of the viewBox
+- NO external images, NO foreignObject, pure SVG paths only
+- Return ONLY the raw SVG code, starting with <svg, no markdown, no explanation`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error('API error ' + response.status);
+  const data = await response.json();
+  const text = data.content?.map(c => c.text || '').join('') || '';
+  // Extract SVG
+  const match = text.match(/<svg[\s\S]*<\/svg>/i);
+  if (!match) throw new Error('No SVG in response');
+  return match[0];
+}
+
+// LEGACY maps kept to avoid reference errors
+const ETENON_URLS = {
+  // PECHO
+  'press en maquina':           'https://etenonfitness.com/es/p/pc2005-pc20-press-de-pecho/',
+  'pec deck':                   'https://etenonfitness.com/es/p/pc2018-pc20-pec-deck/',
+  'pec deck mariposa':          'https://etenonfitness.com/es/p/pc2018-pc20-pec-deck/',
+  'cruces en polea':            'https://etenonfitness.com/es/p/pc0958-multifuncion-smith',
+  'cruces polea baja':          'https://etenonfitness.com/es/p/pc0958-multifuncion-smith',
+  // ESPALDA
+  'jalon al pecho':             'https://etenonfitness.com/es/p/pc2034-pc20-jalon-dorsal/',
+  'jalon dorsal':               'https://etenonfitness.com/es/p/pc2034-pc20-jalon-dorsal/',
+  'jalon agarre estrecho':      'https://etenonfitness.com/es/p/pc0106-jalon/',
+  'jalon con barra':            'https://etenonfitness.com/es/p/pc0107-jalon-con-barra/',
+  'remo en maquina':            'https://etenonfitness.com/es/p/pc2011-pc20-remo-sentado/',
+  'remo en polea sentado':      'https://etenonfitness.com/es/p/pc2011-pc20-remo-sentado/',
+  'face pull':                  'https://etenonfitness.com/es/p/pc0958-multifuncion-smith',
+  // HOMBROS
+  'press hombros en maquina':   'https://etenonfitness.com/es/p/pc2006-pc20-press-de-hombros/',
+  'elevacion lateral en polea': 'https://etenonfitness.com/es/p/pc0958-multifuncion-smith',
+  // BICEPS
+  'curl de biceps':             'https://etenonfitness.com/es/p/pc2007-pc20-curl-de-biceps/',
+  'curl biceps maquina':        'https://etenonfitness.com/es/p/pc2007-pc20-curl-de-biceps/',
+  // TRICEPS
+  'extension de triceps':       'https://etenonfitness.com/es/p/pc2008-pc20-extension-de-triceps/',
+  'jalon de triceps polea':     'https://etenonfitness.com/es/p/pc0958-multifuncion-smith',
+  'jalon con cuerda':           'https://etenonfitness.com/es/p/pc0958-multifuncion-smith',
+  // PIERNAS
+  'prensa de piernas':          'https://etenonfitness.com/es/p/pc0112-prensa-de-piernas/',
+  'hack squat':                 'https://etenonfitness.com/es/p/ptt0120-dual-prensa-inclinada-45o-jaca/',
+  'extension de cuadriceps':    'https://etenonfitness.com/es/p/pc2025-pc20-dual-femoral-extensiones/',
+  'curl femoral tumbado':       'https://etenonfitness.com/es/p/pc2066-pc20-femoral-tumbado/',
+  'curl femoral sentado':       'https://etenonfitness.com/es/p/pc2025-pc20-dual-femoral-extensiones/',
+  'elevacion de talones de pie':'https://etenonfitness.com/es/p/pc2036-pc20-gemelo-de-pie/',
+  'elevacion de talones sentado':'https://etenonfitness.com/es/p/pc2037-pc20-gemelo-sentado/',
+  // GLUTEOS
+  'abduccion en maquina':       'https://etenonfitness.com/es/p/pc2016-pc20-dual-abductor-adductor/',
+  'elevacion de cadera en maquina': 'https://etenonfitness.com/es/p/pc2016-pc20-dual-abductor-adductor/',
+  // CORE
+  'crunch en polea alta':       'https://etenonfitness.com/es/p/pc0958-multifuncion-smith',
+};
+
+// LEGACY — ya no se usa, se mantiene para no romper referencias accidentales
+const EDB_GIFS = {
+  // PECHO
+  'press de banca':            'https://api.exercisedb.io/image/q2METm2cKUMSCi',
+  'press banca mancuernas':    'https://api.exercisedb.io/image/yFkElkZcfynRwZ',
+  'press inclinado mancuernas':'https://api.exercisedb.io/image/iDtGDlJ27sXu5j',
+  'press inclinado barra':     'https://api.exercisedb.io/image/iDtGDlJ27sXu5j',
+  'press en maquina':          'https://api.exercisedb.io/image/q2METm2cKUMSCi',
+  'fondos para pecho':         'https://api.exercisedb.io/image/CjGhSbv6o0sVU7',
+  'cruces en polea':           'https://api.exercisedb.io/image/0Ji6RFNwPdEGBj',
+  'aperturas con mancuernas':  'https://api.exercisedb.io/image/0Ji6RFNwPdEGBj',
+  'flexiones':                 'https://api.exercisedb.io/image/7p7pW12m12oFi5',
+  'pec deck':                  'https://api.exercisedb.io/image/0Ji6RFNwPdEGBj',
+  // ESPALDA
+  'dominadas':                 'https://api.exercisedb.io/image/DSMrNtNgw8Cbk7',
+  'remo con barra':            'https://api.exercisedb.io/image/XiMhMVv5eWGiIB',
+  'jalon al pecho':            'https://api.exercisedb.io/image/rHpnSblNSVJbfq',
+  'remo en maquina':           'https://api.exercisedb.io/image/XiMhMVv5eWGiIB',
+  'remo unilateral mancuerna': 'https://api.exercisedb.io/image/XiMhMVv5eWGiIB',
+  'jalon agarre estrecho':     'https://api.exercisedb.io/image/rHpnSblNSVJbfq',
+  'face pull':                 'https://api.exercisedb.io/image/IHBnANkuAkGEBZ',
+  'peso muerto convencional':  'https://api.exercisedb.io/image/Tbo3vqmNl6NQFP',
+  'peso muerto':               'https://api.exercisedb.io/image/Tbo3vqmNl6NQFP',
+  'remo en polea sentado':     'https://api.exercisedb.io/image/XiMhMVv5eWGiIB',
+  'pullover con mancuerna':    'https://api.exercisedb.io/image/rHpnSblNSVJbfq',
+  // HOMBROS
+  'press militar con barra':   'https://api.exercisedb.io/image/WGKOtT0ooQXdxn',
+  'press arnold':              'https://api.exercisedb.io/image/WGKOtT0ooQXdxn',
+  'press hombros mancuernas':  'https://api.exercisedb.io/image/WGKOtT0ooQXdxn',
+  'elevaciones laterales':     'https://api.exercisedb.io/image/JO5I0CNWM2YHxH',
+  'pajaros invertidos':        'https://api.exercisedb.io/image/IHBnANkuAkGEBZ',
+  'elevaciones frontales':     'https://api.exercisedb.io/image/JO5I0CNWM2YHxH',
+  'elevacion lateral en polea':'https://api.exercisedb.io/image/JO5I0CNWM2YHxH',
+  // BICEPS
+  'curl con barra':            'https://api.exercisedb.io/image/EEMcNwJqLqnazM',
+  'curl martillo':             'https://api.exercisedb.io/image/EEMcNwJqLqnazM',
+  'curl inclinado en banco':   'https://api.exercisedb.io/image/EEMcNwJqLqnazM',
+  'curl en polea baja':        'https://api.exercisedb.io/image/EEMcNwJqLqnazM',
+  'curl concentrado':          'https://api.exercisedb.io/image/EEMcNwJqLqnazM',
+  'curl predicador':           'https://api.exercisedb.io/image/EEMcNwJqLqnazM',
+  // TRICEPS
+  'jalon de triceps en polea': 'https://api.exercisedb.io/image/nzlkOZwFkjBj9j',
+  'rompecraneos':              'https://api.exercisedb.io/image/nzlkOZwFkjBj9j',
+  'fondos en paralelas':       'https://api.exercisedb.io/image/CjGhSbv6o0sVU7',
+  'extension de triceps':      'https://api.exercisedb.io/image/nzlkOZwFkjBj9j',
+  'patada de triceps':         'https://api.exercisedb.io/image/nzlkOZwFkjBj9j',
+  // PIERNAS
+  'sentadilla con barra':      'https://api.exercisedb.io/image/EUItHtQoCOqRSa',
+  'sentadilla':                'https://api.exercisedb.io/image/EUItHtQoCOqRSa',
+  'prensa de piernas':         'https://api.exercisedb.io/image/EWbgzNEwJWNpns',
+  'sentadilla frontal':        'https://api.exercisedb.io/image/EUItHtQoCOqRSa',
+  'hack squat':                'https://api.exercisedb.io/image/EUItHtQoCOqRSa',
+  'sentadilla goblet':         'https://api.exercisedb.io/image/EUItHtQoCOqRSa',
+  'extension de cuadriceps':   'https://api.exercisedb.io/image/EWbgzNEwJWNpns',
+  'curl femoral tumbado':      'https://api.exercisedb.io/image/2wWwWXBOQ0mXgb',
+  'curl femoral sentado':      'https://api.exercisedb.io/image/2wWwWXBOQ0mXgb',
+  'zancadas caminando':        'https://api.exercisedb.io/image/cDoKVAGTkQEbJE',
+  'elevacion de talones':      'https://api.exercisedb.io/image/rFnCFBpMq2XqBb',
+  'peso muerto rumano':        'https://api.exercisedb.io/image/2wWwWXBOQ0mXgb',
+  // GLUTEOS
+  'hip thrust':                'https://api.exercisedb.io/image/SsyAHLQXkq5R1J',
+  'puente de gluteos':         'https://api.exercisedb.io/image/SsyAHLQXkq5R1J',
+  'sentadilla bulgara':        'https://api.exercisedb.io/image/cDoKVAGTkQEbJE',
+  'patada trasera':            'https://api.exercisedb.io/image/SsyAHLQXkq5R1J',
+  // CORE
+  'plancha':                   'https://api.exercisedb.io/image/OBEQ9ynNIHtxLR',
+  'crunch abdominal':          'https://api.exercisedb.io/image/OBEQ9ynNIHtxLR',
+  'elevacion de piernas':      'https://api.exercisedb.io/image/OBEQ9ynNIHtxLR',
+  'rueda abdominal':           'https://api.exercisedb.io/image/OBEQ9ynNIHtxLR',
+};
+
+// Fallback GIFs by exercise type (when name doesn't match)
+const EDB_TYPE_GIFS = {
+  bench_press:   'https://api.exercisedb.io/image/q2METm2cKUMSCi',
+  incline_press: 'https://api.exercisedb.io/image/iDtGDlJ27sXu5j',
+  push_up:       'https://api.exercisedb.io/image/7p7pW12m12oFi5',
+  cable_fly:     'https://api.exercisedb.io/image/0Ji6RFNwPdEGBj',
+  dip:           'https://api.exercisedb.io/image/CjGhSbv6o0sVU7',
+  pull_up:       'https://api.exercisedb.io/image/DSMrNtNgw8Cbk7',
+  lat_pulldown:  'https://api.exercisedb.io/image/rHpnSblNSVJbfq',
+  row:           'https://api.exercisedb.io/image/XiMhMVv5eWGiIB',
+  face_pull:     'https://api.exercisedb.io/image/IHBnANkuAkGEBZ',
+  deadlift:      'https://api.exercisedb.io/image/Tbo3vqmNl6NQFP',
+  rdl:           'https://api.exercisedb.io/image/2wWwWXBOQ0mXgb',
+  shoulder_press:'https://api.exercisedb.io/image/WGKOtT0ooQXdxn',
+  lateral_raise: 'https://api.exercisedb.io/image/JO5I0CNWM2YHxH',
+  curl:          'https://api.exercisedb.io/image/EEMcNwJqLqnazM',
+  tricep:        'https://api.exercisedb.io/image/nzlkOZwFkjBj9j',
+  squat:         'https://api.exercisedb.io/image/EUItHtQoCOqRSa',
+  lunge:         'https://api.exercisedb.io/image/cDoKVAGTkQEbJE',
+  leg_press:     'https://api.exercisedb.io/image/EWbgzNEwJWNpns',
+  hip_thrust:    'https://api.exercisedb.io/image/SsyAHLQXkq5R1J',
+  plank:         'https://api.exercisedb.io/image/OBEQ9ynNIHtxLR',
+  calf_raise:    'https://api.exercisedb.io/image/rFnCFBpMq2XqBb',
+};
+
+// IDs map for ExerciseDB API lookup — fallback when hardcoded URLs don't work
+const EDB_IDS = {
+  bench_press:   '0007', incline_press: '0269', push_up: '0557',
+  cable_fly:     '1184', dip:           '0190', pull_up: '0651',
+  lat_pulldown:  '0289', row:           '0305', face_pull: '1369',
+  deadlift:      '0174', rdl:           '0176', shoulder_press: '0526',
+  lateral_raise: '0291', curl: '0288',  tricep: '0690',
+  squat:         '0685', lunge: '0332', leg_press: '0300',
+  hip_thrust:    '1369', plank: '0430', calf_raise: '1372',
+};
+
+// Normalize Spanish name for lookup
+function _normName(name) {
+  return name.toLowerCase()
+    .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e')
+    .replace(/[íìï]/g,'i').replace(/[óòö]/g,'o')
+    .replace(/[úùü]/g,'u').replace(/ñ/g,'n')
+    .replace(/\s+/g,' ').trim();
+}
+
+// Muscle body SVGs — minimal anatomical figure with muscle group highlighted in accent color
+const MUSCLE_SVG = {
+  // PECHO
+  bench_press:   `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="40" cy="33" rx="13" ry="9" fill="var(--accent)" opacity=".85"/></svg>`,
+  incline_press: `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="40" cy="26" rx="11" ry="7" fill="var(--accent)" opacity=".85"/></svg>`,
+  push_up:       `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="40" cy="33" rx="13" ry="9" fill="var(--accent)" opacity=".85"/></svg>`,
+  cable_fly:     `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="40" cy="33" rx="14" ry="10" fill="var(--accent)" opacity=".85"/></svg>`,
+  dip:           `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="22" cy="50" rx="5" ry="9" fill="var(--accent)" opacity=".85" transform="rotate(-10 22 50)"/><ellipse cx="58" cy="50" rx="5" ry="9" fill="var(--accent)" opacity=".85" transform="rotate(10 58 50)"/></svg>`,
+  // ESPALDA
+  pull_up:       `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><path d="M26 28 Q16 38 22 52 Q26 42 34 36 Z" fill="var(--accent)" opacity=".85"/><path d="M54 28 Q64 38 58 52 Q54 42 46 36 Z" fill="var(--accent)" opacity=".85"/></svg>`,
+  lat_pulldown:  `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><path d="M26 28 Q16 38 22 52 Q26 42 34 36 Z" fill="var(--accent)" opacity=".85"/><path d="M54 28 Q64 38 58 52 Q54 42 46 36 Z" fill="var(--accent)" opacity=".85"/></svg>`,
+  row:           `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><rect x="28" y="28" width="24" height="18" rx="4" fill="var(--accent)" opacity=".85"/></svg>`,
+  face_pull:     `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="40" cy="26" rx="12" ry="6" fill="var(--accent)" opacity=".85"/></svg>`,
+  deadlift:      `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><rect x="34" y="22" width="12" height="28" rx="3" fill="var(--accent)" opacity=".85"/></svg>`,
+  rdl:           `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="32" cy="68" rx="5" ry="10" fill="var(--accent)" opacity=".85"/><ellipse cx="48" cy="68" rx="5" ry="10" fill="var(--accent)" opacity=".85"/></svg>`,
+  // HOMBROS
+  shoulder_press:`<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><circle cx="22" cy="28" r="6" fill="var(--accent)" opacity=".85"/><circle cx="58" cy="28" r="6" fill="var(--accent)" opacity=".85"/></svg>`,
+  lateral_raise: `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><circle cx="22" cy="28" r="7" fill="var(--accent)" opacity=".85"/><circle cx="58" cy="28" r="7" fill="var(--accent)" opacity=".85"/></svg>`,
+  // BRAZOS
+  curl:          `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="21" cy="38" rx="4" ry="7" fill="var(--accent)" opacity=".85" transform="rotate(15 21 38)"/><ellipse cx="59" cy="38" rx="4" ry="7" fill="var(--accent)" opacity=".85" transform="rotate(-15 59 38)"/></svg>`,
+  tricep:        `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="19" cy="42" rx="4" ry="8" fill="var(--accent)" opacity=".85" transform="rotate(20 19 42)"/><ellipse cx="61" cy="42" rx="4" ry="8" fill="var(--accent)" opacity=".85" transform="rotate(-20 61 42)"/></svg>`,
+  // PIERNAS
+  squat:         `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="32" cy="62" rx="6" ry="11" fill="var(--accent)" opacity=".85"/><ellipse cx="48" cy="62" rx="6" ry="11" fill="var(--accent)" opacity=".85"/></svg>`,
+  lunge:         `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="32" cy="62" rx="6" ry="11" fill="var(--accent)" opacity=".85"/><ellipse cx="48" cy="62" rx="6" ry="11" fill="var(--accent)" opacity=".85"/></svg>`,
+  leg_press:     `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="32" cy="62" rx="6" ry="12" fill="var(--accent)" opacity=".85"/><ellipse cx="48" cy="62" rx="6" ry="12" fill="var(--accent)" opacity=".85"/></svg>`,
+  hip_thrust:    `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="40" cy="55" rx="14" ry="8" fill="var(--accent)" opacity=".85"/></svg>`,
+  calf_raise:    `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><ellipse cx="32" cy="78" rx="4" ry="7" fill="var(--accent)" opacity=".85"/><ellipse cx="48" cy="78" rx="4" ry="7" fill="var(--accent)" opacity=".85"/></svg>`,
+  plank:         `<svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="10" rx="8" ry="8" fill="#444"/><line x1="40" y1="18" x2="40" y2="55" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="20" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="30" x2="60" y2="45" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="30" y2="80" stroke="#444" stroke-width="3"/><line x1="40" y1="55" x2="50" y2="80" stroke="#444" stroke-width="3"/><rect x="30" y="38" width="20" height="14" rx="3" fill="var(--accent)" opacity=".85"/></svg>`,
+};
+
+function _normName(name) {
+  return name.toLowerCase()
+    .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e')
+    .replace(/[íìï]/g,'i').replace(/[óòö]/g,'o')
+    .replace(/[úùü]/g,'u').replace(/ñ/g,'n')
+    .replace(/\s+/g,' ').trim();
+}
+
+async function drawIllus(type, exName = '') {
   const loadEl = document.getElementById('ex-gif-loading');
-  if (!gifEl || !loadEl) return;
-  gifEl.style.display = 'none';
+  if (!loadEl) return;
+
+  const cacheKey = type + '_' + _normName(exName).replace(/\s/g,'_');
+  const muscles = MUSCLE_INFO[type] || {pri:['Músculo principal'],sec:[]};
+
+  // Show spinner immediately
   loadEl.style.display = 'flex';
-  // Use inline SVG illustrations — no external fetch needed
-  const svg = EXERCISE_SVG[type] || EXERCISE_SVG._default;
-  loadEl.innerHTML = svg;
+  loadEl.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;width:100%;height:100%;min-height:180px;">
+      <div style="position:relative;width:48px;height:48px;">
+        <svg viewBox="0 0 48 48" style="width:48px;height:48px;animation:spin .9s linear infinite;">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border2)" stroke-width="3"/>
+          <path d="M24 4 A20 20 0 0 1 44 24" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div style="font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;opacity:.7;">Generando ilustración…</div>
+    </div>`;
+
+  // 1. Check memory cache
+  if (_illusMemCache[cacheKey]) {
+    _renderIllusSVG(_illusMemCache[cacheKey], loadEl, muscles);
+    return;
+  }
+
+  // 2. Check localStorage cache
+  const cached = _illusLsGet(cacheKey);
+  if (cached) {
+    _illusMemCache[cacheKey] = cached;
+    _renderIllusSVG(cached, loadEl, muscles);
+    return;
+  }
+
+  // 3. Generate via Claude API
+  try {
+    const svg = await _generateMuscleSVG(type, exName, muscles);
+    _illusMemCache[cacheKey] = svg;
+    _illusLsSet(cacheKey, svg);
+    _renderIllusSVG(svg, loadEl, muscles);
+  } catch(e) {
+    console.warn('Illus API error:', e);
+    _renderIllusFallback(loadEl, muscles);
+  }
+}
+
+function _renderIllusSVG(svg, loadEl, muscles) {
+  loadEl.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:0;">
+      <div style="width:100%;max-width:200px;margin:0 auto;animation:fadeIn .4s ease;">
+        ${svg}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:8px 12px 10px;">
+        ${muscles.pri.map(m=>`<span style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;">${m}</span>`).join('<span style="color:var(--border2);">·</span>')}
+        ${muscles.sec.length ? '<span style="color:var(--border2);font-size:10px;">|</span>' + muscles.sec.map(m=>`<span style="font-size:10px;color:var(--muted);">${m}</span>`).join('<span style="color:var(--border2);font-size:9px;">·</span>') : ''}
+      </div>
+    </div>`;
+  // Make sure SVG fills container
+  const s = loadEl.querySelector('svg');
+  if (s) { s.style.width='100%'; s.style.height='auto'; s.style.display='block'; }
+}
+
+function _renderIllusFallback(loadEl, muscles) {
+  const pri = (muscles||{}).pri || ['Músculo'];
+  loadEl.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;opacity:.6;">
+      <svg width="60" height="100" viewBox="0 0 60 100" fill="none">
+        <ellipse cx="30" cy="8" rx="7" ry="7" fill="#333"/>
+        <line x1="30" y1="15" x2="30" y2="45" stroke="#333" stroke-width="3"/>
+        <line x1="30" y1="22" x2="12" y2="36" stroke="#333" stroke-width="2.5"/>
+        <line x1="30" y1="22" x2="48" y2="36" stroke="#333" stroke-width="2.5"/>
+        <line x1="30" y1="45" x2="22" y2="68" stroke="#333" stroke-width="2.5"/>
+        <line x1="30" y1="45" x2="38" y2="68" stroke="#333" stroke-width="2.5"/>
+        <ellipse cx="30" cy="28" rx="11" ry="8" fill="var(--accent)" opacity=".5"/>
+      </svg>
+      <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">${pri[0]}</div>
+    </div>`;
 }
 
 function showGifFallback() {
   const loadEl = document.getElementById('ex-gif-loading');
-  if(loadEl) loadEl.innerHTML = EXERCISE_SVG._default;
+  if (loadEl) _renderIllusFallback(loadEl, {pri:['Ejercicio']});
 }
 
-// ── INLINE SVG EXERCISE ILLUSTRATIONS ──
-const _c={skin:'#e8b89a',skinD:'#d4a088',shorts:'#2a2a4a',shirt:'#3a5a8a',bar:'#9a9ab0',plate:'#5a5a7a',bench:'#4a4a6a',accent:'#f5ff50',floor:'#1a1a2e',hair:'#3a2a1a',shoe:'#222',rope:'#888',band:'#e85050',mach:'#3a3a5a',pad:'#2a3a5a',cable:'#666'};
-const _body=(x,y,sc=1)=>`<g transform="translate(${x},${y}) scale(${sc})">`;
-const _head=(x,y)=>`<circle cx="${x}" cy="${y}" r="14" fill="${_c.skin}"/><circle cx="${x}" cy="${y-1}" r="14" fill="${_c.skin}"/><ellipse cx="${x}" cy="${y-10}" rx="13" ry="6" fill="${_c.hair}"/>`;
-const _torso=(x,y,h=50)=>`<rect x="${x-14}" y="${y}" width="28" height="${h}" rx="6" fill="${_c.shirt}"/>`;
-
-const EXERCISE_SVG = {
-  bench_press:`<svg viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="60" y="110" width="160" height="12" rx="4" fill="${_c.bench}"/>
-    <rect x="55" y="122" width="8" height="50" rx="2" fill="${_c.bench}"/>
-    <rect x="217" y="122" width="8" height="50" rx="2" fill="${_c.bench}"/>
-    <rect x="55" y="80" width="8" height="36" rx="2" fill="${_c.bench}"/>
-    <rect x="50" y="76" width="18" height="6" rx="2" fill="${_c.bench}"/>
-    <rect x="20" y="88" width="240" height="6" rx="3" fill="${_c.bar}"/>
-    <rect x="10" y="82" width="28" height="18" rx="4" fill="${_c.plate}"/><rect x="242" y="82" width="28" height="18" rx="4" fill="${_c.plate}"/>
-    <ellipse cx="140" cy="108" rx="40" ry="10" fill="${_c.shirt}" opacity=".8"/>
-    ${_head(140,96)}
-    <rect x="126" y="100" width="28" height="14" rx="4" fill="${_c.shirt}"/>
-    <line x1="128" y1="100" x2="100" y2="88" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="152" y1="100" x2="180" y2="88" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="126" y1="112" x2="90" y2="140" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="154" y1="112" x2="190" y2="140" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="185" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">PRESS DE BANCA</text>
-  </svg>`,
-
-  incline_press:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="90" y="60" width="14" height="110" rx="4" fill="${_c.bench}" transform="rotate(-25,97,115)"/>
-    <rect x="20" y="70" width="240" height="6" rx="3" fill="${_c.bar}"/>
-    <rect x="10" y="64" width="26" height="18" rx="4" fill="${_c.plate}"/><rect x="244" y="64" width="26" height="18" rx="4" fill="${_c.plate}"/>
-    ${_head(140,82)}
-    <rect x="126" y="88" width="28" height="45" rx="5" fill="${_c.shirt}" transform="rotate(-20,140,110)"/>
-    <line x1="130" y1="92" x2="96" y2="72" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="150" y1="92" x2="184" y2="72" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="130" y1="130" x2="110" y2="165" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="150" y1="130" x2="170" y2="165" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="190" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">PRESS INCLINADO</text>
-  </svg>`,
-
-  push_up:`<svg viewBox="0 0 280 200" fill="none">
-    <line x1="40" y1="155" x2="240" y2="155" stroke="${_c.floor}" stroke-width="4"/>
-    ${_head(70,120)}
-    <line x1="80" y1="130" x2="200" y2="125" stroke="${_c.shirt}" stroke-width="18" stroke-linecap="round"/>
-    <line x1="200" y1="125" x2="230" y2="125" stroke="${_c.shorts}" stroke-width="14" stroke-linecap="round"/>
-    <line x1="70" y1="135" x2="70" y2="155" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="90" y1="135" x2="90" y2="155" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="230" y1="130" x2="235" y2="155" stroke="${_c.skin}" stroke-width="6" stroke-linecap="round"/>
-    <text x="140" y="185" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">FLEXIONES</text>
-  </svg>`,
-
-  cable_fly:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="20" y="30" width="12" height="140" rx="3" fill="${_c.mach}"/>
-    <rect x="248" y="30" width="12" height="140" rx="3" fill="${_c.mach}"/>
-    <line x1="26" y1="50" x2="110" y2="100" stroke="${_c.cable}" stroke-width="2"/>
-    <line x1="254" y1="50" x2="170" y2="100" stroke="${_c.cable}" stroke-width="2"/>
-    ${_head(140,72)}
-    <rect x="126" y="84" width="28" height="50" rx="6" fill="${_c.shirt}"/>
-    <line x1="130" y1="94" x2="110" y2="100" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="150" y1="94" x2="170" y2="100" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="130" y1="130" x2="120" y2="168" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="150" y1="130" x2="160" y2="168" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="190" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">CRUCES EN POLEA</text>
-  </svg>`,
-
-  dip:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="80" y="80" width="8" height="100" rx="2" fill="${_c.bench}"/>
-    <rect x="192" y="80" width="8" height="100" rx="2" fill="${_c.bench}"/>
-    <rect x="76" y="76" width="16" height="8" rx="3" fill="${_c.bench}"/>
-    <rect x="188" y="76" width="16" height="8" rx="3" fill="${_c.bench}"/>
-    ${_head(140,52)}
-    <rect x="126" y="64" width="28" height="46" rx="6" fill="${_c.shirt}"/>
-    <line x1="128" y1="74" x2="88" y2="78" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="152" y1="74" x2="196" y2="78" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="132" y1="108" x2="122" y2="155" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="108" x2="158" y2="155" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="185" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">FONDOS</text>
-  </svg>`,
-
-  pull_up:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="40" y="25" width="200" height="8" rx="3" fill="${_c.bar}"/>
-    <rect x="40" y="25" width="8" height="20" rx="2" fill="${_c.mach}"/>
-    <rect x="232" y="25" width="8" height="20" rx="2" fill="${_c.mach}"/>
-    ${_head(140,58)}
-    <line x1="128" y1="48" x2="105" y2="30" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="48" x2="175" y2="30" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="126" y="70" width="28" height="50" rx="6" fill="${_c.shirt}"/>
-    <line x1="132" y1="118" x2="125" y2="165" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="118" x2="155" y2="165" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">DOMINADAS</text>
-  </svg>`,
-
-  lat_pulldown:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="120" y="20" width="40" height="10" rx="3" fill="${_c.mach}"/>
-    <rect x="136" y="10" width="8" height="16" rx="2" fill="${_c.cable}"/>
-    <rect x="60" y="28" width="160" height="6" rx="3" fill="${_c.bar}"/>
-    <line x1="140" y1="32" x2="140" y2="50" stroke="${_c.cable}" stroke-width="2"/>
-    ${_head(140,62)}
-    <rect x="126" y="74" width="28" height="46" rx="6" fill="${_c.shirt}"/>
-    <line x1="128" y1="80" x2="80" y2="40" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="80" x2="200" y2="40" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="100" y="118" width="80" height="10" rx="3" fill="${_c.bench}"/>
-    <line x1="132" y1="118" x2="125" y2="155" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="118" x2="155" y2="155" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="185" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">JALÓN AL PECHO</text>
-  </svg>`,
-
-  row:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(110,68)}
-    <line x1="115" y1="80" x2="180" y2="110" stroke="${_c.shirt}" stroke-width="22" stroke-linecap="round"/>
-    <line x1="180" y1="110" x2="185" y2="160" stroke="${_c.shorts}" stroke-width="12" stroke-linecap="round"/>
-    <line x1="180" y1="110" x2="210" y2="160" stroke="${_c.shorts}" stroke-width="12" stroke-linecap="round"/>
-    <line x1="120" y1="100" x2="120" y2="130" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="145" y1="100" x2="145" y2="130" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="60" y="126" width="140" height="6" rx="3" fill="${_c.bar}"/>
-    <rect x="50" y="120" width="24" height="18" rx="4" fill="${_c.plate}"/><rect x="186" y="120" width="24" height="18" rx="4" fill="${_c.plate}"/>
-    <text x="140" y="190" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">REMO CON BARRA</text>
-  </svg>`,
-
-  face_pull:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="250" y="30" width="14" height="130" rx="3" fill="${_c.mach}"/>
-    <line x1="257" y1="70" x2="175" y2="85" stroke="${_c.cable}" stroke-width="2"/>
-    <line x1="257" y1="70" x2="175" y2="80" stroke="${_c.cable}" stroke-width="2"/>
-    ${_head(140,68)}
-    <rect x="126" y="80" width="28" height="48" rx="6" fill="${_c.shirt}"/>
-    <line x1="152" y1="86" x2="175" y2="80" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="90" x2="175" y2="85" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="132" y1="126" x2="125" y2="168" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="126" x2="155" y2="168" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="190" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">FACE PULL</text>
-  </svg>`,
-
-  deadlift:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(140,48)}
-    <line x1="140" y1="60" x2="140" y2="110" stroke="${_c.shirt}" stroke-width="24" stroke-linecap="round"/>
-    <line x1="134" y1="108" x2="118" y2="155" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="146" y1="108" x2="162" y2="155" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="132" y1="72" x2="110" y2="120" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="148" y1="72" x2="170" y2="120" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="50" y="118" width="180" height="6" rx="3" fill="${_c.bar}"/>
-    <rect x="36" y="108" width="28" height="24" rx="5" fill="${_c.plate}"/><rect x="216" y="108" width="28" height="24" rx="5" fill="${_c.plate}"/>
-    <rect x="44" y="112" width="20" height="16" rx="3" fill="#6a6a8a"/>
-    <rect x="224" y="112" width="20" height="16" rx="3" fill="#6a6a8a"/>
-    <text x="140" y="185" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">PESO MUERTO</text>
-  </svg>`,
-
-  rdl:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(120,56)}
-    <line x1="125" y1="68" x2="170" y2="100" stroke="${_c.shirt}" stroke-width="22" stroke-linecap="round"/>
-    <line x1="168" y1="98" x2="162" y2="155" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="172" y1="98" x2="185" y2="155" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="130" y1="82" x2="120" y2="125" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="150" y1="90" x2="140" y2="125" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="60" y="122" width="140" height="5" rx="2" fill="${_c.bar}"/>
-    <rect x="50" y="116" width="24" height="18" rx="4" fill="${_c.plate}"/><rect x="186" y="116" width="24" height="18" rx="4" fill="${_c.plate}"/>
-    <text x="140" y="185" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">PESO MUERTO RUMANO</text>
-  </svg>`,
-
-  shoulder_press:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(140,55)}
-    <rect x="126" y="68" width="28" height="46" rx="6" fill="${_c.shirt}"/>
-    <line x1="128" y1="74" x2="96" y2="42" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="74" x2="184" y2="42" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="50" y="36" width="180" height="6" rx="3" fill="${_c.bar}"/>
-    <rect x="38" y="30" width="26" height="18" rx="4" fill="${_c.plate}"/><rect x="216" y="30" width="26" height="18" rx="4" fill="${_c.plate}"/>
-    <line x1="132" y1="112" x2="122" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="112" x2="158" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">PRESS MILITAR</text>
-  </svg>`,
-
-  lateral_raise:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(140,52)}
-    <rect x="126" y="64" width="28" height="50" rx="6" fill="${_c.shirt}"/>
-    <line x1="128" y1="76" x2="62" y2="76" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="76" x2="218" y2="76" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="50" y="70" width="14" height="14" rx="4" fill="${_c.plate}"/>
-    <rect x="216" y="70" width="14" height="14" rx="4" fill="${_c.plate}"/>
-    <line x1="132" y1="112" x2="122" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="112" x2="158" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">ELEVACIONES LATERALES</text>
-  </svg>`,
-
-  curl:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(140,48)}
-    <rect x="126" y="60" width="28" height="50" rx="6" fill="${_c.shirt}"/>
-    <line x1="128" y1="72" x2="116" y2="96" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="116" y1="96" x2="112" y2="72" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="72" x2="164" y2="96" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="164" y1="96" x2="168" y2="72" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="102" y="66" width="10" height="12" rx="3" fill="${_c.plate}"/>
-    <rect x="168" y="66" width="10" height="12" rx="3" fill="${_c.plate}"/>
-    <line x1="132" y1="108" x2="122" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="108" x2="158" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">CURL DE BÍCEPS</text>
-  </svg>`,
-
-  tricep:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="220" y="20" width="14" height="140" rx="3" fill="${_c.mach}"/>
-    <line x1="227" y1="40" x2="165" y2="80" stroke="${_c.cable}" stroke-width="2"/>
-    ${_head(140,52)}
-    <rect x="126" y="64" width="28" height="48" rx="6" fill="${_c.shirt}"/>
-    <line x1="152" y1="74" x2="165" y2="80" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="165" y1="80" x2="168" y2="108" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="128" y1="74" x2="115" y2="80" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="115" y1="80" x2="112" y2="108" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="132" y1="110" x2="122" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="110" x2="158" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">TRÍCEPS EN POLEA</text>
-  </svg>`,
-
-  squat:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(140,42)}
-    <rect x="60" y="44" width="160" height="6" rx="3" fill="${_c.bar}"/>
-    <rect x="48" y="38" width="24" height="18" rx="4" fill="${_c.plate}"/><rect x="208" y="38" width="24" height="18" rx="4" fill="${_c.plate}"/>
-    <rect x="126" y="54" width="28" height="42" rx="6" fill="${_c.shirt}"/>
-    <line x1="132" y1="94" x2="112" y2="128" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="148" y1="94" x2="168" y2="128" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="112" y1="128" x2="108" y2="162" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="168" y1="128" x2="172" y2="162" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">SENTADILLA</text>
-  </svg>`,
-
-  lunge:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(140,42)}
-    <rect x="126" y="54" width="28" height="44" rx="6" fill="${_c.shirt}"/>
-    <rect x="126" y="48" width="10" height="12" rx="3" fill="${_c.plate}"/>
-    <rect x="144" y="48" width="10" height="12" rx="3" fill="${_c.plate}"/>
-    <line x1="136" y1="96" x2="100" y2="138" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="100" y1="138" x2="95" y2="165" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="144" y1="96" x2="185" y2="118" stroke="${_c.shorts}" stroke-width="11" stroke-linecap="round"/>
-    <line x1="185" y1="118" x2="195" y2="165" stroke="${_c.skin}" stroke-width="8" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">ZANCADAS</text>
-  </svg>`,
-
-  leg_press:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="50" y="120" width="120" height="14" rx="4" fill="${_c.mach}" transform="rotate(-35,110,127)"/>
-    <rect x="160" y="50" width="60" height="80" rx="6" fill="${_c.mach}" opacity=".6"/>
-    ${_head(95,100)}
-    <rect x="88" y="108" width="22" height="30" rx="5" fill="${_c.shirt}"/>
-    <line x1="96" y1="136" x2="148" y2="88" stroke="${_c.shorts}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="104" y1="136" x2="158" y2="92" stroke="${_c.shorts}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="148" y1="88" x2="166" y2="70" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="158" y1="92" x2="176" y2="74" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">PRENSA DE PIERNAS</text>
-  </svg>`,
-
-  hip_thrust:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="60" y="100" width="60" height="40" rx="6" fill="${_c.bench}"/>
-    ${_head(90,90)}
-    <line x1="100" y1="108" x2="170" y2="95" stroke="${_c.shirt}" stroke-width="20" stroke-linecap="round"/>
-    <rect x="130" y="86" width="60" height="7" rx="3" fill="${_c.bar}"/>
-    <rect x="122" y="80" width="18" height="18" rx="4" fill="${_c.plate}"/>
-    <rect x="192" y="80" width="18" height="18" rx="4" fill="${_c.plate}"/>
-    <line x1="170" y1="100" x2="195" y2="140" stroke="${_c.shorts}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="195" y1="140" x2="195" y2="165" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="170" y1="104" x2="210" y2="140" stroke="${_c.shorts}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="210" y1="140" x2="210" y2="165" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">HIP THRUST</text>
-  </svg>`,
-
-  plank:`<svg viewBox="0 0 280 200" fill="none">
-    <line x1="40" y1="155" x2="240" y2="155" stroke="${_c.floor}" stroke-width="4"/>
-    ${_head(80,115)}
-    <line x1="90" y1="122" x2="210" y2="118" stroke="${_c.shirt}" stroke-width="18" stroke-linecap="round"/>
-    <line x1="210" y1="118" x2="228" y2="118" stroke="${_c.shorts}" stroke-width="12" stroke-linecap="round"/>
-    <line x1="82" y1="130" x2="82" y2="155" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="228" y1="122" x2="232" y2="155" stroke="${_c.skin}" stroke-width="6" stroke-linecap="round"/>
-    <text x="140" y="185" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">PLANCHA</text>
-  </svg>`,
-
-  calf_raise:`<svg viewBox="0 0 280 200" fill="none">
-    <rect x="110" y="155" width="60" height="14" rx="3" fill="${_c.mach}"/>
-    ${_head(140,38)}
-    <rect x="126" y="50" width="28" height="50" rx="6" fill="${_c.shirt}"/>
-    <line x1="132" y1="98" x2="128" y2="145" stroke="${_c.shorts}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="148" y1="98" x2="152" y2="145" stroke="${_c.shorts}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="128" y1="145" x2="126" y2="155" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="145" x2="154" y2="155" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="100" y="38" width="80" height="8" rx="3" fill="${_c.bar}"/>
-    <rect x="88" y="32" width="22" height="18" rx="4" fill="${_c.plate}"/>
-    <rect x="170" y="32" width="22" height="18" rx="4" fill="${_c.plate}"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">ELEVACIÓN DE TALONES</text>
-  </svg>`,
-
-  _default:`<svg viewBox="0 0 280 200" fill="none">
-    ${_head(140,55)}
-    <rect x="126" y="68" width="28" height="50" rx="6" fill="${_c.shirt}"/>
-    <line x1="128" y1="78" x2="100" y2="100" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="152" y1="78" x2="180" y2="100" stroke="${_c.skin}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="132" y1="116" x2="122" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="148" y1="116" x2="158" y2="162" stroke="${_c.shorts}" stroke-width="9" stroke-linecap="round"/>
-    <text x="140" y="188" text-anchor="middle" fill="${_c.accent}" font-size="11" font-weight="800" opacity=".6">EJERCICIO</text>
-  </svg>`,
-};
 
 
 // ── CUSTOM EXERCISE MODAL ──
@@ -3151,7 +3331,7 @@ function alertRestFinished(){
   // 4. Web Notification (if permission granted)
   try{
     if('Notification' in window && Notification.permission==='granted'){
-      new Notification('IRONIQ ⏰',{body:'¡Descanso terminado! Siguiente serie',icon:'/icons/icon-192.png',tag:'rest-done',requireInteraction:false});
+      new Notification('GND ⏰',{body:'¡Descanso terminado! Siguiente serie',icon:'/icons/icon-192.png',tag:'rest-done',requireInteraction:false});
     }
   }catch(e){}
 }
@@ -3761,6 +3941,86 @@ const CATALOG=[
   {id:'turkish_getup',name:'Turkish Get-Up',muscle:'Full Body',equipment:'Kettlebell',type:'plank',tips:['Movimiento muy técnico: aprende sin peso','Excelente para la estabilidad total del cuerpo','La muñeca y el brazo siempre perpendicular al suelo']},
   {id:'box_jump',name:'Salto al Cajón',muscle:'Full Body',equipment:'Cajón',type:'squat',tips:['Aterriza suavemente con rodillas flexionadas','Baja caminando, no saltando hacia atrás','Trabaja la potencia explosiva de piernas']},
   {id:'sled_push',name:'Empuje de Trineo',muscle:'Full Body',equipment:'Trineo',type:'squat',tips:['Inclinación a 45 grados hacia adelante','Pasos cortos y rápidos','Alta intensidad cardiovascular y de fuerza']},
+
+  // ── PECHO ADICIONAL ──
+  {id:'svend_press',name:'Svend Press',muscle:'Pecho',equipment:'Disco',type:'cable_fly',tips:['Aprieta un disco entre las palmas con fuerza','Extiende los brazos al frente lentamente','La tensión isométrica activa profundamente el pectoral']},
+  {id:'landmine_press_chest',name:'Press Landmine Pecho',muscle:'Pecho',equipment:'Barra',type:'incline_press',tips:['Agarra el extremo de la barra con una mano','Ángulo diagonal activa la parte media del pecho','Gran alternativa si tienes dolor en el hombro']},
+  {id:'db_pullover',name:'Pullover con Mancuerna',muscle:'Pecho',equipment:'Mancuerna',type:'cable_fly',tips:['Brazos casi rectos, leve flexión en codos','Estira el pecho y el dorsal','Baja la mancuerna por detrás de la cabeza controladamente']},
+  {id:'hex_press',name:'Hex Press (Press Neutro)',muscle:'Pecho',equipment:'Mancuernas',type:'bench_press',tips:['Mantén las mancuernas apretadas entre sí todo el movimiento','Activa al máximo la parte central del pecho','Muñecas neutras, codos cerca del cuerpo']},
+  {id:'push_up_wide',name:'Flexión Agarre Ancho',muscle:'Pecho',equipment:'Peso Corporal',type:'push_up',tips:['Manos más separadas que el ancho de hombros','Mayor activación del pectoral externo','Baja hasta que el pecho casi toque el suelo']},
+  {id:'archer_pushup',name:'Flexión Arquero',muscle:'Pecho',equipment:'Peso Corporal',type:'push_up',tips:['Desplaza el peso hacia un lado en cada rep','Excelente progresión hacia la flexión a una mano','Mantén el core rígido en todo momento']},
+  {id:'dips_chest',name:'Fondos para Pecho',muscle:'Pecho',equipment:'Paralelas',type:'dip',tips:['Inclínate hacia adelante para enfatizar el pecho','Baja hasta que los hombros estén por debajo de los codos','Los codos apuntan ligeramente hacia afuera']},
+  {id:'cable_crossover_low',name:'Cruce de Poleas Bajo',muscle:'Pecho',equipment:'Poleas',type:'cable_fly',tips:['Poleas en posición baja, tira hacia arriba y al centro','Activa el pectoral superior y clavicular','Mantén una ligera inclinación hacia adelante']},
+  {id:'cable_crossover_mid',name:'Cruce de Poleas Medio',muscle:'Pecho',equipment:'Poleas',type:'cable_fly',tips:['Poleas a la altura de los hombros','Tira al frente manteniendo los codos ligeramente flexionados','Contrae fuerte en el punto de cruce']},
+
+  // ── ESPALDA ADICIONAL ──
+  {id:'pullup_wide',name:'Dominadas Agarre Ancho',muscle:'Espalda',equipment:'Barra Fija',type:'pull_up',tips:['Agarre prono más ancho que los hombros','Tira hacia abajo pensando en los codos','Baja de forma controlada completamente']},
+  {id:'pullup_neutral',name:'Dominadas Agarre Neutro',muscle:'Espalda',equipment:'Barra Fija',type:'pull_up',tips:['Palmas enfrentadas: menos estrés en codos','Activa bien bíceps y dorsal a la vez','Sube hasta que el pecho casi toque la barra']},
+  {id:'inverted_row',name:'Remo Invertido (TRX/Barra)',muscle:'Espalda',equipment:'Barra Fija',type:'row',tips:['Cuerpo inclinado: cuanto más horizontal, más difícil','Aprieta las escápulas al subir','Excelente para principiantes en remos']},
+  {id:'single_arm_cable_row',name:'Remo en Polea a Una Mano',muscle:'Espalda',equipment:'Polea Baja',type:'row',tips:['Rota ligeramente el torso para más rango','Tira del codo hacia atrás y arriba','Mayor activación unilateral del dorsal']},
+  {id:'rack_pull',name:'Rack Pull',muscle:'Espalda',equipment:'Barra',type:'deadlift',tips:['Barra en el rack a la altura de las rodillas','Excelente para trabajar el rango superior del peso muerto','Permite usar más peso que el peso muerto convencional']},
+  {id:'straight_arm_pulldown',name:'Jalón a Brazos Extendidos',muscle:'Espalda',equipment:'Polea Alta',type:'lat_pulldown',tips:['Brazos rectos durante todo el movimiento','Lleva la barra hacia los muslos','Excelente para aislar el dorsal ancho']},
+  {id:'seal_row',name:'Remo Sello (Chest Supported)',muscle:'Espalda',equipment:'Banco',type:'row',tips:['Pecho apoyado en banco inclinado','Elimina el balanceo: trabajo puro de espalda','Tira de los codos hacia el techo']},
+  {id:'chest_supported_row_db',name:'Remo con Mancuernas Pecho Apoyado',muscle:'Espalda',equipment:'Mancuernas',type:'row',tips:['Banco inclinado a 30-45 grados','Pecho contra el banco: espalda aislada','Lleva los codos hacia arriba y atrás']},
+  {id:'pendlay_row',name:'Remo Pendlay',muscle:'Espalda',equipment:'Barra',type:'row',tips:['Torso paralelo al suelo, espalda plana','Tira explosivamente desde el suelo cada rep','La barra toca el suelo entre repeticiones']},
+
+  // ── HOMBROS ADICIONAL ──
+  {id:'landmine_lateral',name:'Elevación Lateral con Landmine',muscle:'Hombros',equipment:'Barra',type:'lateral_raise',tips:['Mayor tensión en la posición inferior del movimiento','El arco de la barra facilita el patrón natural','Mantén el codo ligeramente flexionado']},
+  {id:'cable_lateral_behind',name:'Elevación Lateral Polea Cruzada',muscle:'Hombros',equipment:'Poleas',type:'lateral_raise',tips:['Cable pasa por detrás del cuerpo','Tensión constante en todo el rango','Una mano a la vez para mayor rango']},
+  {id:'upright_row',name:'Remo al Mentón',muscle:'Hombros',equipment:'Barra',type:'face_pull',tips:['Agarre estrecho, tira hacia la barbilla','Codos por encima de las muñecas en la cima','No subas más de la barbilla para proteger el hombro']},
+  {id:'handstand_pushup',name:'Flexión en Pino',muscle:'Hombros',equipment:'Peso Corporal',type:'shoulder_press',tips:['Contra la pared para estabilidad','Los deltoides trabajan extremadamente duro','Progresión: flexión pike inclinada primero']},
+  {id:'bus_driver',name:'Bus Driver con Disco',muscle:'Hombros',equipment:'Disco',type:'lateral_raise',tips:['Sostén el disco con los brazos al frente','Rota el disco de lado a lado como un volante','Activa el deltoides anterior y lateral']},
+  {id:'band_pull_apart',name:'Band Pull Apart',muscle:'Hombros',equipment:'Banda Elástica',type:'face_pull',tips:['Brazos al frente, separa la banda a los lados','Trabaja el manguito rotador y deltoides posterior','Excelente calentamiento y ejercicio de postura']},
+
+  // ── BÍCEPS ADICIONAL ──
+  {id:'zottman_curl',name:'Curl Zottman',muscle:'Bíceps',equipment:'Mancuernas',type:'curl',tips:['Sube con agarre supino, baja con agarre prono','Trabaja bíceps y braquiorradial en el mismo movimiento','Movimiento lento y controlado']},
+  {id:'cable_curl_overhead',name:'Curl en Polea Overhead',muscle:'Bíceps',equipment:'Polea Alta',type:'curl',tips:['Poleas a la altura de los hombros o más','Tira hacia la sien doblando el codo','Activa la cabeza larga del bíceps con estiramiento máximo']},
+  {id:'bayesian_curl',name:'Curl Bayesiano (Polea Baja Unilateral)',muscle:'Bíceps',equipment:'Polea Baja',type:'curl',tips:['De espaldas a la polea baja','El brazo ligeramente detrás del cuerpo','Máximo estiramiento del bíceps en la posición inicial']},
+  {id:'cross_body_curl',name:'Curl Cross-Body',muscle:'Bíceps',equipment:'Mancuerna',type:'curl',tips:['Lleva la mancuerna hacia el hombro opuesto','Trabaja el bíceps desde otro ángulo','Alterna brazos o hazlos juntos']},
+  {id:'21s_curl',name:'Curl 21s',muscle:'Bíceps',equipment:'Barra',type:'curl',tips:['7 reps rango inferior (abajo a la mitad)','7 reps rango superior (mitad a arriba)','7 reps rango completo: trabaja todo el bíceps']},
+
+  // ── TRÍCEPS ADICIONAL ──
+  {id:'jm_press',name:'JM Press',muscle:'Tríceps',equipment:'Barra',type:'tricep',tips:['Híbrido entre press de banca y rompecráneos','Baja la barra hacia la garganta con codos a 45°','Excelente activación de la cabeza larga del tríceps']},
+  {id:'tricep_dip_weighted',name:'Fondos en Paralelas con Peso',muscle:'Tríceps',equipment:'Paralelas',type:'dip',tips:['Cinturón de lastre o mancuerna entre las rodillas','Cuerpo vertical para enfatizar el tríceps','Progresión natural de los fondos con peso corporal']},
+  {id:'tate_press',name:'Tate Press',muscle:'Tríceps',equipment:'Mancuernas',type:'tricep',tips:['Mancuernas al pecho, codos apuntan al techo','Extiende los brazos sin mover los codos','Excelente activación de la cabeza lateral']},
+  {id:'cable_tricep_overhead',name:'Extensión de Tríceps Overhead en Polea',muscle:'Tríceps',equipment:'Polea Alta',type:'tricep',tips:['Da la espalda a la polea, cuerda por encima de la cabeza','Codos fijos a los lados de la cabeza','Rango de movimiento completo para la cabeza larga']},
+  {id:'db_tricep_kickback_incline',name:'Patada de Tríceps Inclinado',muscle:'Tríceps',equipment:'Mancuerna',type:'tricep',tips:['Apoya el pecho en banco inclinado','Elimina el balanceo del torso','Extiende completamente el codo en cada rep']},
+
+  // ── PIERNAS ADICIONAL ──
+  {id:'pause_squat',name:'Sentadilla con Pausa',muscle:'Piernas',equipment:'Barra',type:'squat',tips:['Pausa 2-3 segundos en la posición baja','Elimina el reflejo de estiramiento: más fuerza pura','Mantén la tensión en cuádriceps durante la pausa']},
+  {id:'jefferson_squat',name:'Jefferson Squat',muscle:'Piernas',equipment:'Barra',type:'squat',tips:['Una pierna a cada lado de la barra','Asimétrico: activa caderas y core diferente','Excelente para la movilidad y la fuerza unilateral']},
+  {id:'sissy_squat',name:'Sissy Squat',muscle:'Piernas',equipment:'Peso Corporal',type:'squat',tips:['Talones elevados, inclínate hacia atrás','Aísla completamente los cuádriceps','Muy intenso: empieza con poco rango de movimiento']},
+  {id:'copenhagen_plank',name:'Plancha de Copenhague',muscle:'Piernas',equipment:'Banco',type:'plank',tips:['Pierna de arriba apoyada en el banco','Trabaja el aductor interno intensamente','Progresión: apoya la rodilla antes que el tobillo']},
+  {id:'nordic_curl',name:'Nordic Curl (Femoral Nórdico)',muscle:'Piernas',equipment:'Banco',type:'rdl',tips:['Pies sujetos, baja con el cuerpo recto','Uno de los mejores ejercicios para los isquiosurales','Frena la caída con las manos si es necesario']},
+  {id:'heel_elevated_squat',name:'Sentadilla con Talones Elevados',muscle:'Piernas',equipment:'Mancuernas',type:'squat',tips:['Talones sobre discos o cuña','Mayor profundidad y activación de cuádriceps','Excelente si tienes poca movilidad de tobillo']},
+  {id:'single_leg_press',name:'Prensa a Una Pierna',muscle:'Piernas',equipment:'Máquina',type:'leg_press',tips:['Trabaja cada pierna por separado para detectar desequilibrios','Mismo rango de movimiento que la prensa bilateral','Mayor activación del glúteo unilateral']},
+  {id:'prone_hip_extension',name:'Extensión de Cadera Boca Abajo',muscle:'Piernas',equipment:'Máquina',type:'rdl',tips:['Trabaja isquiotibiales y glúteos','Rodilla flexionada = más bíceps femoral','No balancees el cuerpo para ayudarte']},
+
+  // ── GLÚTEOS ADICIONAL ──
+  {id:'frog_pump',name:'Frog Pump',muscle:'Glúteos',equipment:'Peso Corporal',type:'hip_thrust',tips:['Plantas de los pies juntas, rodillas hacia afuera','Empuja las caderas hacia arriba con glúteos','Activa el glúteo desde un ángulo diferente al puente clásico']},
+  {id:'hip_abduction_standing',name:'Abducción de Cadera de Pie en Polea',muscle:'Glúteos',equipment:'Polea Baja',type:'hip_thrust',tips:['Lleva la pierna al lado controladamente','No inclines el torso para compensar','Activa el glúteo medio y menor']},
+  {id:'donkey_kick',name:'Patada de Burro en Cuadrupedia',muscle:'Glúteos',equipment:'Peso Corporal',type:'hip_thrust',tips:['A cuatro patas, lleva el talón hacia el techo','Rodilla flexionada a 90°','Aprieta el glúteo en la posición más alta']},
+  {id:'curtsy_lunge',name:'Zancada Curtsy',muscle:'Glúteos',equipment:'Mancuernas',type:'lunge',tips:['Lleva el pie trasero en diagonal detrás del cuerpo','Activa el glúteo medio más que la zancada normal','Mantén el torso erguido durante el movimiento']},
+  {id:'glute_ham_raise',name:'Glute-Ham Raise',muscle:'Glúteos',equipment:'Máquina',type:'rdl',tips:['Uno de los mejores ejercicios para isquios y glúteos','Baja lento controlando la excéntrica','Flexiona las rodillas al subir para añadir dificultad']},
+  {id:'broad_jump',name:'Salto de Longitud',muscle:'Glúteos',equipment:'Peso Corporal',type:'squat',tips:['Salta lo más lejos posible desde posición de cuclillas','Aterriza suavemente con rodillas amortiguando','Trabaja potencia y explosividad de glúteos y piernas']},
+
+  // ── CORE ADICIONAL ──
+  {id:'dead_bug',name:'Dead Bug',muscle:'Core',equipment:'Peso Corporal',type:'plank',tips:['Espalda baja pegada al suelo en todo momento','Extiende brazo y pierna opuestos simultáneamente','Movimiento lento: cada rep dura 3-4 segundos']},
+  {id:'hollow_hold',name:'Hollow Body Hold',muscle:'Core',equipment:'Peso Corporal',type:'plank',tips:['Lumbar pegada al suelo: posición de "cuenco"','Brazos al oído y piernas extendidas elevadas','Base de la gimnasia: activa todo el núcleo']},
+  {id:'dragon_flag',name:'Dragon Flag',muscle:'Core',equipment:'Banco',type:'plank',tips:['Sujétate al banco sobre la cabeza','Mantén el cuerpo rígido como una tabla','Uno de los ejercicios de core más difíciles']},
+  {id:'windshield_wipers',name:'Limpiaparabrisas (Hanging Wipers)',muscle:'Core',equipment:'Barra Fija',type:'plank',tips:['Colgado de la barra, piernas a 90°','Rota las piernas de lado a lado','Control total: no uses el impulso']},
+  {id:'l_sit',name:'L-Sit',muscle:'Core',equipment:'Paralelas',type:'plank',tips:['Sostén el cuerpo con los brazos extendidos','Piernas horizontales al suelo','Trabaja core, tríceps y flexores de cadera a la vez']},
+  {id:'stir_the_pot',name:'Stir the Pot (Plancha en Fitball)',muscle:'Core',equipment:'Fitball',type:'plank',tips:['Codos en el fitball en posición de plancha','Dibuja círculos con los codos hacia un lado','Inestabilidad del balón: mayor activación del core']},
+  {id:'v_up',name:'V-Up',muscle:'Core',equipment:'Peso Corporal',type:'plank',tips:['Sube simultáneamente piernas y torso','Toca los pies con las manos en la cima','Movimiento explosivo: trabaja recto abdominal completo']},
+  {id:'cable_woodchop',name:'Cable Wood Chop',muscle:'Core',equipment:'Polea',type:'plank',tips:['Rotación de torso con polea alta o baja','Trabaja los oblicuos en toda su función','Los pies fijos: toda la rotación viene del torso']},
+  {id:'ab_rollout_barbell',name:'Ab Rollout con Barra',muscle:'Core',equipment:'Barra',type:'plank',tips:['Usa discos pequeños de 10kg','Más difícil que la rueda abdominal por el agarre','Mantén la cadera baja: no arquees la espalda']},
+
+  // ── CARDIO / ACONDICIONAMIENTO ──
+  {id:'jump_rope',name:'Saltar a la Comba',muscle:'Full Body',equipment:'Comba',type:'push_up',tips:['Muñecas, no brazos: gira solo con las muñecas','Salta sobre la punta de los pies','Empieza con salto básico, progresa al doble giro']},
+  {id:'battle_ropes',name:'Battle Ropes',muscle:'Full Body',equipment:'Cuerdas de Batalla',type:'push_up',tips:['Rodillas ligeramente flexionadas, core activado','Ondas alternas o simultáneas cambian el estímulo','30-45 segundos de máximo esfuerzo por ronda']},
+  {id:'assault_bike',name:'Assault Bike',muscle:'Full Body',equipment:'Bicicleta',type:'push_up',tips:['Empuja y tira del manillar simultáneamente con las piernas','Los sprints cortos (10-20 seg) son brutalmente efectivos','Posición erguida para maximizar el trabajo de brazos']},
+  {id:'ski_erg',name:'SkiErg',muscle:'Full Body',equipment:'Máquina',type:'pull_up',tips:['Agarre al ancho de hombros, tira hacia abajo explosivamente','Dobla rodillas y caderas al final del tirón','Excelente para el acondicionamiento cardiovascular']},
+  {id:'prowler_push',name:'Empuje de Prowler',muscle:'Full Body',equipment:'Trineo',type:'squat',tips:['Manos altas = menos cuádriceps, más caderas','Pasos cortos y explosivos','Varía la carga: pesado y lento o ligero y rápido']},
 ];
 </script>
 </body>

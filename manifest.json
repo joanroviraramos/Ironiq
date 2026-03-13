@@ -1,6 +1,6 @@
 {
-  "name": "IRONIQ - Entrena Más Inteligente",
-  "short_name": "IRONIQ",
+  "name": "GND - Entrena Más Inteligente",
+  "short_name": "GND",
   "description": "Tu entrenador personal con IA",
   "start_url": "/",
   "display": "standalone",
