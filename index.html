@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0d0d14">
+<meta name="screen-orientation" content="portrait">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -34,9 +35,9 @@
   --bh:72px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:100%;overscroll-behavior:none}
+html{height:100%;overscroll-behavior:none;overflow:hidden}
 body{
-  min-height:100%;
+  min-height:100%;height:100%;
   background:var(--bg);
   background-image:
     radial-gradient(ellipse 100% 60% at 15% 0%,rgba(79,163,255,.15) 0%,transparent 55%),
@@ -48,7 +49,20 @@ body{
   max-width:430px;
   margin:0 auto;
   overflow-x:hidden;
+  overflow-y:auto;
   padding-bottom:var(--bh);
+  touch-action:pan-y;
+  -webkit-text-size-adjust:100%;
+}
+/* Force portrait: rotate the entire UI when phone is in landscape */
+@media screen and (orientation:landscape) and (max-height:500px){
+  html{
+    transform:rotate(-90deg);
+    transform-origin:left top;
+    width:100vh;height:100vw;
+    overflow-x:hidden;overflow-y:auto;
+    position:absolute;top:100%;left:0;
+  }
 }
 input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -1338,6 +1352,8 @@ async function storageSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 // ── SERVICE WORKER ──
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 
+// ── LOCK PORTRAIT ORIENTATION ──
+try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('portrait').catch(()=>{});}catch(e){}
 // ── INIT ──
 window.onload=()=>{
   setTimeout(()=>{
@@ -1847,7 +1863,7 @@ function togS(wi,ei,si){
     const restSec=parseRest(plan[wi].exercises[ei].rest||'90s');
     const nextUndone=series.findIndex(x=>!x.done);
     if(nextUndone>=0)startRest(restSec,plan[wi].exercises[ei].name,nextUndone+1,series.length);
-    else beepFinish();
+    else alertRestFinished();
   }
   if(!seriesState[wi])seriesState[wi]={};
   seriesState[wi][ei]=series.filter(x=>x.done).length;
@@ -2649,33 +2665,94 @@ function toast(msg,type='ok'){
   setTimeout(()=>el.classList.remove('show'),3200);
 }
 
-// ── REST TIMER ──
+// ── REST TIMER (timestamp-based — survives background) ──
 function parseRest(s){const n=parseInt(String(s));return isNaN(n)?90:n;}
+let restEndTime=0; // absolute timestamp when rest finishes
 function startRest(secs,exName,nextSet,totalSets){
   const pop=document.getElementById('rest-pop');if(!pop)return;
   restTotal=secs;restLeft=secs;
+  restEndTime=Date.now()+secs*1000;
   document.getElementById('rest-exname').textContent=exName;
   document.getElementById('rest-next').textContent=`Serie ${nextSet} de ${totalSets}`;
   pop.classList.add('show');updateRestUI();
   if(restIval)clearInterval(restIval);
   restIval=setInterval(()=>{
-    restLeft--;
-    if(restLeft<=0){clearInterval(restIval);restIval=null;pop.classList.remove('show');beepFinish();return;}
+    const remaining=Math.ceil((restEndTime-Date.now())/1000);
+    restLeft=Math.max(0,remaining);
+    if(restLeft<=0){clearInterval(restIval);restIval=null;pop.classList.remove('show');alertRestFinished();return;}
     updateRestUI();
-  },1000);
+  },250); // faster tick to catch background return
 }
 function updateRestUI(){
   document.getElementById('rest-secs').textContent=restLeft;
   const circ=document.getElementById('rest-arc');
   if(circ){const C=194.8;circ.setAttribute('stroke-dashoffset',String(C*(1-restLeft/restTotal)));}
 }
-function skipRest(){if(restIval){clearInterval(restIval);restIval=null;}document.getElementById('rest-pop').classList.remove('show');}
-function beepFinish(){
-  try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-  o.connect(g);g.connect(audioCtx.destination);o.frequency.value=880;g.gain.value=0.15;
-  o.start();o.stop(audioCtx.currentTime+0.12);}catch(e){}
+function skipRest(){if(restIval){clearInterval(restIval);restIval=null;}restEndTime=0;document.getElementById('rest-pop').classList.remove('show');}
+
+// Recalculate rest on return from background
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden && restEndTime>0){
+    const remaining=Math.ceil((restEndTime-Date.now())/1000);
+    restLeft=Math.max(0,remaining);
+    if(restLeft<=0){
+      if(restIval){clearInterval(restIval);restIval=null;}
+      restEndTime=0;
+      document.getElementById('rest-pop').classList.remove('show');
+      alertRestFinished();
+    } else {
+      updateRestUI();
+    }
+  }
+});
+
+// ── REST FINISHED ALERT (sound + vibration + notification) ──
+function alertRestFinished(){
+  // 1. Triple beep sound
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const now=audioCtx.currentTime;
+    [0, 0.18, 0.36].forEach(delay=>{
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.connect(g);g.connect(audioCtx.destination);
+      o.frequency.value=delay===0.36?1046:880; // last beep higher pitch
+      g.gain.setValueAtTime(0.25,now+delay);
+      g.gain.exponentialRampToValueAtTime(0.001,now+delay+0.15);
+      o.start(now+delay);o.stop(now+delay+0.15);
+    });
+  }catch(e){}
+  // 2. Vibrate (works on Android, some iOS)
+  try{if(navigator.vibrate)navigator.vibrate([200,100,200,100,300]);}catch(e){}
+  // 3. Show toast
+  toast('⏰ ¡Descanso terminado! A por la siguiente serie 💪','ok');
+  // 4. Web Notification (if permission granted)
+  try{
+    if('Notification' in window && Notification.permission==='granted'){
+      new Notification('IRONIQ ⏰',{body:'¡Descanso terminado! Siguiente serie',icon:'/icons/icon-192.png',tag:'rest-done',requireInteraction:false});
+    }
+  }catch(e){}
 }
+
+// Request notification permission on first rest start
+function requestNotifPermission(){
+  try{
+    if('Notification' in window && Notification.permission==='default'){
+      Notification.requestPermission();
+    }
+  }catch(e){}
+}
+// Ask permission early on user interaction
+document.addEventListener('click',function _reqNotif(){requestNotifPermission();document.removeEventListener('click',_reqNotif);},{once:true});
+
+// Also update session elapsed display on return from background
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden && sessionActive && sessStart){
+    updateElapsed();
+    // Restart display tick if it died in background
+    if(!sessTimerIval) startTick();
+  }
+});
 
 // ── EXERCISE MODAL ──
 function openModal(wIdx,exIdx){
@@ -2770,7 +2847,7 @@ function togModalSerie(i){
     const rest=parseRest(curModalEx?.rest||'90s');
     const nextS=modalSeries.findIndex(s=>!s.done);
     if(nextS>=0)startRest(rest,curModalEx.name,nextS+1,modalSeries.length);
-    else beepFinish();
+    else alertRestFinished();
   }
 }
 function addSerie(){
