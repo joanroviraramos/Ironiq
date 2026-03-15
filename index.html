@@ -1428,7 +1428,9 @@ function updateDash(){
 function renderPlanList(id){
   const el=document.getElementById(id);if(!el)return;
   if(!plan.length){el.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:44px;margin-bottom:12px;opacity:.4">💪</div><div style="font-size:14px;line-height:1.5">Sin plan todavía.<br>¡Genera uno con IA!</div></div>';return;}
-  el.innerHTML=plan.map((w,i)=>`
+  const dayOrder=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  const sorted=[...plan].sort((a,b)=>dayOrder.indexOf(a.day)-dayOrder.indexOf(b.day));
+  el.innerHTML=sorted.map((w)=>{const i=plan.indexOf(w);return `
     <div class="wk-card" onclick="openDetail(${i})">
       <div class="wk-card-top">
         <div class="wk-day">${w.day.toUpperCase()}</div>
@@ -1444,7 +1446,7 @@ function renderPlanList(id){
         <button class="wa-btn" onclick="editWorkout(${i})">✏️ Editar</button>
         <button class="wa-btn del" onclick="deleteWorkout(${i})">🗑</button>
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 function renderWorkouts(){ renderPlanList('workouts-list'); }
 
@@ -1560,139 +1562,20 @@ function wizNext(){
 }
 
 // ── AI PLAN GENERATION (with wizard data) ──
-async function generatePlan(){
+function generatePlan(){
   const btn=document.getElementById('gen-btn');
-  btn.disabled=true;btn.innerHTML='<span>⚡</span><span>GENERANDO...</span>';
-  const gmap={volumen:'ganar músculo e hipertrofia',definicion:'definición y pérdida de grasa',fuerza:'fuerza máxima',resistencia:'resistencia muscular',perdida_peso:'perder peso',general:'fitness general'};
-  const priMap={pecho:'pecho',espalda:'espalda ancha y gruesa',hombros:'hombros redondos y anchos',brazos:'bíceps y tríceps grandes',gluteos:'glúteos fuertes y voluminosos',piernas:'piernas potentes (cuádriceps e isquios)',core:'abdominales definidos y core fuerte',todo:'desarrollo equilibrado'};
-  const styleMap={push_pull:'Push/Pull/Legs',antagonista:'Músculos antagonistas (ej: pecho+espalda)',torso_pierna:'Torso/Pierna',fullbody:'Full Body cada día',weider:'Un grupo muscular principal por día',auto:'el split que mejor se adapte al objetivo y número de días'};
-  const equipMap={gym:'Gimnasio GND con máquinas Etenon Fitness profesionales (prensa piernas, hack squat, jalón dorsal, remo sentado, press pecho, pec deck, curl bíceps, extensión tríceps, femoral, extensión cuádriceps, abductor/adductor, gemelo, press hombros, poleas altas y bajas, Smith)',basic:'gimnasio básico (barras, mancuernas, banco, polea)',minimal:'peso corporal y bandas elásticas solamente',home_db:'casa con mancuernas y banco ajustable'};
-
-  const priorities=wizData.priorities.filter(p=>p!=='todo').map(p=>priMap[p]||p).join(', ')||'desarrollo equilibrado de todo el cuerpo';
-  const injuryList=wizData.injuries.filter(p=>p!=='ninguna');
-
-  // FIX: Lesiones → instrucción específica de usar máquinas guiadas
-  const injTxt=injuryList.length
-    ?`\nLESIONES ACTIVAS: ${injuryList.join(', ')}.
-- OBLIGATORIO: NO incluyas ejercicios con carga libre que comprometan estas zonas
-- USA MÁQUINAS GUIADAS como alternativa segura: para rodilla→prensa/extensión en máquina en vez de sentadilla libre; para lumbar→jalón/remo en máquina en vez de peso muerto con barra; para hombro→press en máquina en vez de press libre; para muñeca/codo→máquinas con agarre neutro
-- Indica en los tips cómo adaptar la ejecución a la lesión`:''  ;
-
-  // FIX: Preferencias — si prefiere máquinas, instrucción explícita
-  const prefMaquinas=wizData.preferences.includes('maquinas');
-  const prefPoleas=wizData.preferences.includes('poleas');
-  const otherPrefs=wizData.preferences.filter(p=>p!=='maquinas'&&p!=='poleas');
-  let prefTxt='';
-  if(prefMaquinas) prefTxt+=`\nPREFERENCIA MÁQUINAS: Este usuario PREFIERE MÁQUINAS sobre peso libre. USA máquinas Etenon para TODOS los ejercicios posibles. Solo usa barras/mancuernas cuando no haya alternativa en máquina.`;
-  if(prefPoleas) prefTxt+=`\nPREFERENCIA POLEAS: Incluye ejercicios de polea (cruces, jalones, remos en polea, extensiones, curl en polea).`;
-  if(otherPrefs.length) prefTxt+=`\nEJERCICIOS FAVORITOS: ${otherPrefs.join(', ')}. Inclúyelos si encajan con el plan.`;
-
-  const notesTxt=wizData.notes?`\nNOTAS DEL USUARIO: "${wizData.notes}"`:'';
-
-  const isFemale=profile.gender==='femenino';
-  const genderTxt=isFemale?'mujer':'hombre';
-
-  // FIX: Validación coherencia días ↔ estilo
-  const nDays=profile.days.length;
-  let styleFixed=wizData.style;
-  let styleWarning='';
-  if(styleFixed==='push_pull'&&nDays<3){styleFixed='fullbody';styleWarning='\n⚠️ Push/Pull/Legs requiere 3+ días — cambiado automáticamente a Full Body.';}
-  if(styleFixed==='weider'&&nDays<4){styleFixed='torso_pierna';styleWarning='\n⚠️ Weider requiere 4+ días — cambiado automáticamente a Torso/Pierna.';}
-  if(styleFixed==='torso_pierna'&&nDays<4){styleFixed='fullbody';styleWarning='\n⚠️ Torso/Pierna requiere 4+ días — cambiado automáticamente a Full Body.';}
-  if(styleFixed==='antagonista'&&nDays<3){styleFixed='fullbody';styleWarning='\n⚠️ Antagonista requiere 3+ días — cambiado automáticamente a Full Body.';}
-
-  // FIX: Nivel principiante — restricciones
-  const levelTxt=profile.level==='principiante'
-    ?`\nNIVEL PRINCIPIANTE: Evita ejercicios técnicamente complejos (peso muerto con barra, sentadilla olímpica, press banca pesado). Prioriza MÁQUINAS GUIADAS que enseñan el patrón de movimiento. Rangos altos de reps (12-15) con pesos moderados.`
-    :profile.level==='avanzado'
-    ?`\nNIVEL AVANZADO: Puedes incluir ejercicios compuestos pesados, técnicas avanzadas (superseries, drop sets). Rangos 6-8 en compuestos principales.`
-    :'';
-
-  const genderHints=isFemale
-    ?`\nADAPTACIÓN POR GÉNERO (MUJER):
-- Más tren inferior: glúteos, isquios, abductores
-- Ejercicios clave: hip thrust en máquina, prensa, extensión femoral, abductor/adductor, curl femoral
-- Rangos 10-15 reps, pesos tren superior ~40% peso corporal, tren inferior ~60-80%
-- Menos énfasis en pecho/tríceps aislado salvo que lo pida
-- Activación de glúteo medio: abducción en máquina, patada trasera en polea`
-    :`\nADAPTACIÓN POR GÉNERO (HOMBRE):
-- Más volumen tren superior: pecho, espalda, hombros, brazos
-- Rangos 6-12 reps en compuestos, más peso relativo
-- Bíceps/tríceps como accesorios habituales`;
-
-  // FIX: Instrucción maestra de máquinas Etenon (siempre presente si gym)
-  const etenon=wizData.equipment==='gym'
-    ?`\nGIMNASIO GND — MÁQUINAS ETENON FITNESS:
-El gimnasio dispone de máquinas profesionales Etenon. REGLA PRINCIPAL: PRIORIZA SIEMPRE ejercicios en máquina sobre peso libre. Ejemplos de sustitución obligatoria:
-• Sentadilla libre → Prensa de piernas o Hack Squat Etenon
-• Peso muerto barra → Curl femoral + extensión en máquina Etenon
-• Press banca barra → Press pecho en máquina Etenon o Smith
-• Remo barra → Remo sentado en máquina Etenon
-• Dominadas → Jalón dorsal en máquina Etenon
-• Press militar barra → Press hombros en máquina Etenon
-• Curl bíceps barra → Curl bíceps en máquina Etenon
-• Extensión tríceps → Extensión tríceps en máquina Etenon
-Solo usa peso libre (barras/mancuernas) cuando el ejercicio no tenga equivalente en máquina o el usuario lo prefiera específicamente.`
-    :'';
-
-  const prompt=`Eres un entrenador personal de ÉLITE especializado en gimnasios con equipamiento Etenon Fitness. Crea un plan semanal 100% PERSONALIZADO.
-
-PERFIL: ${profile.name}, ${genderTxt}, ${profile.age} años, ${profile.weight}kg, ${profile.height}cm, nivel ${profile.level}.
-OBJETIVO PRINCIPAL: ${gmap[profile.goal]||profile.goal}.
-DÍAS DE ENTRENAMIENTO: ${nDays} días (${profile.days.join(', ')}).
-PRIORIDADES MUSCULARES: Enfoque especial en ${priorities}. Dedica MÁS ejercicios y volumen a estas zonas.
-ESTILO DE ENTRENAMIENTO: ${styleMap[styleFixed]||'elige el mejor split'}.${styleWarning}
-EQUIPAMIENTO: ${equipMap[wizData.equipment]||'gimnasio completo'}.${etenon}${prefTxt}${injTxt}${notesTxt}${levelTxt}${genderHints}
-
-REGLAS DE ENTRENADOR EXPERTO:
-- EL PLAN DEBE SER DIFERENTE según género, prioridades y objetivo. NO uses la misma plantilla genérica para todos.
-- Si prioriza glúteos: mínimo 2 días con hip thrust en máquina, prensa con pies altos, curl femoral, abductor/adductor Etenon
-- Si prioriza pecho: mínimo 2 días con press en máquina, pec deck, cruces en polea con ángulos distintos
-- Si prioriza espalda: jalón dorsal, remo sentado en máquina, polea baja con distintos agarres
-- Zonas prioritarias: 2-3 ejercicios extra vs zonas normales
-- Compuestos/máquinas SIEMPRE primero, aislamiento al final
-- Pesos realistas para ${genderTxt} de ${profile.weight}kg, nivel ${profile.level}
-- 5-7 ejercicios/sesión
-- SERIES Y REPS OBLIGATORIOS según objetivo y nivel:
-  • Volumen/Hipertrofia → compuestos: 4 series × 8-10 reps | aislamiento: 3 series × 10-12 reps
-  • Fuerza → compuestos: 4-5 series × 3-6 reps | aislamiento: 3 series × 8-10 reps
-  • Definición/Pérdida peso → 3-4 series × 12-15 reps en todos
-  • Resistencia → 3 series × 15-20 reps en todos
-  • Principiante: SIEMPRE 3 series máximo, reps altas (10-15). Avanzado puede llegar a 5 series en compuestos.
-  NUNCA generes 2 series. El mínimo es 3 series.
-- Descanso entre series: fuerza→180-240s compuestos / hipertrofia→90-120s compuestos, 60s aislamiento / definición y resistencia→45-60s todo
-- 3 tips técnicos ESPECÍFICOS y ÚTILES por ejercicio (no genéricos, menciona ajustes de la máquina si aplica)
-- Nombres de sesión creativos y motivadores${injuryList.length?'\n- CRÍTICO: NO incluyas ejercicios que carguen: '+injuryList.join(', ')+'. Siempre alternativa en máquina guiada.':''}
-- COHERENCIA MUSCULAR OBLIGATORIA: cada sesión debe trabajar SOLO los músculos del título. Si la sesión es "Pecho y Tríceps" → SOLO ejercicios de pecho y tríceps, NUNCA core, piernas ni hombros. Si es "Hombros y Brazos" → SOLO hombros, bíceps y tríceps. Si es "Espalda y Bíceps" → SOLO espalda y bíceps. El core se puede incluir como 1 ejercicio final SOLO en sesiones Full Body o si el estilo es Weider con día específico de core.
-- DISTRIBUCIÓN por sesión: primero todos los compuestos del grupo principal, luego aislamiento del grupo principal, luego accesorios del grupo secundario. NUNCA mezcles grupos de días diferentes.
-
-RESPONDE SOLO JSON (sin markdown, sin backticks, sin explicaciones):
-{"plan":[{"day":"Lunes","name":"NOMBRE CREATIVO","duration":65,"muscles":["M1","M2"],"exercises":[{"name":"Nombre Ejercicio","muscle":"Músculo","equipment":"Equipo","type":"bench_press","sets":4,"reps":"8-10","weight":"60","rest":"90s","tips":["tip técnico 1","tip técnico 2","tip técnico 3"]}]}]}
-
-Tipos válidos para "type": bench_press,incline_press,push_up,cable_fly,dip,pull_up,lat_pulldown,row,face_pull,deadlift,rdl,shoulder_press,lateral_raise,curl,tricep,squat,lunge,leg_press,hip_thrust,plank,calf_raise`;
-
+  if(btn){btn.disabled=true;btn.innerHTML='<span>⚡</span><span>GENERANDO...</span>';}
   try{
-    let apiOk=false,d=null;
-    try{
-      const claudeBody={model:'claude-sonnet-4-20250514',max_tokens:8000,messages:[{role:'user',content:prompt}]};
-      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(claudeBody)});
-      if(r.ok){d=await r.json();apiOk=true;}
-    }catch(e){}
-    if(apiOk&&d?.content?.length){
-      const txt=d.content.map(b=>b.text||'').join('');
-      const s=txt.indexOf('{'),e=txt.lastIndexOf('}');
-      if(s!==-1&&e!==-1){plan=JSON.parse(txt.slice(s,e+1)).plan;storageSet('iq3_plan',JSON.stringify(plan));seriesState={};updateDash();toast('¡Plan personalizado generado! 🎉','ok');}
-      else throw new Error('parse');
-    } else {plan=generateLocalPlan();storageSet('iq3_plan',JSON.stringify(plan));seriesState={};updateDash();toast('¡Plan generado! 💪','ok');}
+    plan=generateLocalPlan();
+    storageSet('iq3_plan',JSON.stringify(plan));
+    seriesState={};
+    updateDash();
+    toast('¡Plan generado! 💪','ok');
   }catch(e){
-    try{plan=generateLocalPlan();storageSet('iq3_plan',JSON.stringify(plan));seriesState={};updateDash();toast('¡Plan generado! 💪','ok');}
-    catch(e2){toast('Error','err');}
+    toast('Error al generar el plan','err');
   }
-  btn.disabled=false;btn.innerHTML='<span>⚡</span><span>REGENERAR PLAN IA</span>';
+  if(btn){btn.disabled=false;btn.innerHTML='<span>⚡</span><span>GENERAR PLAN</span>';}
 }
-
-
-// ── LOCAL PLAN GENERATOR (fallback — gender & priority aware) ──
 function generateLocalPlan(){
   const days=profile.days||['Lunes','Martes','Miércoles','Jueves','Viernes'];
   const goal=profile.goal||'general';
@@ -1849,16 +1732,18 @@ function generateLocalPlan(){
     
     // ── Style-based overrides (when user explicitly chose a style) ──
     if(style==='push_pull'){
-      if(numDays<=3) return ['upper_push','upper_pull','piernas_full'];
-      if(numDays===4) return ['upper_push','upper_pull','piernas_full',priGluteos?'gluteos_isquios':'hombros_brazos'];
-      if(numDays===5) return ['upper_push','upper_pull','piernas_full',priGluteos?'gluteos_isquios':'hombros_brazos',priGluteos?'gluteos_piernas':'upper_full'];
-      return ['upper_push','upper_pull','piernas_full','upper_push','upper_pull',priGluteos?'gluteos_piernas':'lower_full'];
+      // Push/Pull/Legs: los días de piernas separados por push o pull
+      if(numDays<=3) return ['upper_push','upper_pull','piernas_quad'];
+      if(numDays===4) return ['upper_push','piernas_quad','upper_pull','piernas_posterior'];
+      if(numDays===5) return ['upper_push','upper_pull','piernas_quad','upper_push','piernas_posterior'];
+      return ['upper_push','piernas_quad','upper_pull','piernas_posterior','upper_push','upper_pull'];
     }
     if(style==='torso_pierna'){
-      if(numDays<=3) return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full'];
-      if(numDays===4) return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full',priGluteos?'gluteos_isquios':'piernas_full'];
-      if(numDays===5) return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full',priGluteos?'gluteos_isquios':'piernas_full','brazos_core'];
-      return ['upper_full',priGluteos?'gluteos_piernas':'lower_full','upper_full',priGluteos?'gluteos_isquios':'piernas_full','brazos_core','core_cardio'];
+      // Torso/Pierna: siempre alternando, nunca dos piernas seguidas
+      if(numDays<=3) return ['upper_full','piernas_quad','upper_full'];
+      if(numDays===4) return ['upper_full','piernas_quad','upper_full','piernas_posterior'];
+      if(numDays===5) return ['upper_full','piernas_quad','upper_full','piernas_posterior','upper_full'];
+      return ['upper_full','piernas_quad','upper_full','piernas_posterior','upper_full','piernas_quad'];
     }
     if(style==='fullbody'){
       const fb=isFemale?'fullbody_f':'fullbody_m';
@@ -1869,46 +1754,53 @@ function generateLocalPlan(){
       return [fb,priGluteos?fbg:fb,fb,priGluteos?fbg:fb,fb,fb];
     }
     if(style==='weider'){
-      if(numDays<=3) return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full'];
-      if(numDays===4) return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full','hombros_brazos'];
-      if(numDays===5) return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full','hombros_brazos','brazos_core'];
-      return [priGluteos?'gluteos_piernas':'pecho_triceps','espalda_biceps',priGluteos?'gluteos_isquios':'piernas_full','hombros_brazos','brazos_core','core_cardio'];
+      // Estructura real: nunca dos días de piernas seguidos, siempre separados por otro músculo
+      // 3d: pecho / espalda / piernas
+      // 4d: pecho / espalda / piernas cuád / hombros+core
+      // 5d: pecho / espalda / piernas cuád / hombros+core / piernas posterior
+      // 6d: pecho / espalda / piernas cuád / hombros+core / piernas posterior / brazos+core
+      if(numDays===3) return ['pecho_triceps','espalda_biceps',priGluteos?'piernas_posterior':'piernas_full'];
+      if(numDays===4) return ['pecho_triceps','espalda_biceps','piernas_quad','hombros_core'];
+      if(numDays===5) return ['pecho_triceps','espalda_biceps','piernas_quad','hombros_core','piernas_posterior'];
+      return ['pecho_triceps','espalda_biceps','piernas_quad','hombros_core','piernas_posterior','brazos_core'];
     }
     
     // ── Auto / Antagonista: gender & priority based (original logic) ──
     // Female with glute priority → glute-focused splits
     if(isFemale && (priGluteos || priPiernas)){
-      if(numDays<=3) return ['gluteos_piernas','upper_light','gluteos_isquios'];
-      if(numDays===4) return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull'];
-      if(numDays===5) return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull','fullbody_glute'];
-      return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull','fullbody_glute','core_cardio'];
+      // Piernas SIEMPRE separadas por 2+ días de tren superior
+      if(numDays<=3) return ['piernas_posterior','upper_full','piernas_quad'];
+      if(numDays===4) return ['piernas_posterior','upper_push','upper_pull','piernas_quad'];
+      if(numDays===5) return ['piernas_posterior','upper_push','upper_pull','piernas_quad','hombros_core'];
+      return ['piernas_posterior','upper_push','upper_pull','piernas_quad','hombros_core','piernas_posterior'];
     }
     // Female default → balanced with more lower body
     if(isFemale){
-      if(numDays<=3) return ['lower_full','upper_full','lower_glute'];
-      if(numDays===4) return ['lower_full','upper_push','lower_glute','upper_pull'];
-      if(numDays===5) return ['lower_full','upper_push','lower_glute','upper_pull','fullbody_f'];
-      return ['lower_full','upper_push','lower_glute','upper_pull','fullbody_f','core_cardio'];
+      // Piernas separadas por 2+ días siempre
+      if(numDays<=3) return ['piernas_quad','upper_full','piernas_posterior'];
+      if(numDays===4) return ['piernas_quad','upper_push','upper_pull','piernas_posterior'];
+      if(numDays===5) return ['piernas_quad','upper_push','upper_pull','piernas_posterior','hombros_core'];
+      return ['piernas_quad','upper_push','upper_pull','piernas_posterior','hombros_core','piernas_quad'];
     }
     // Male with chest priority
     if(priPecho){
       if(numDays<=3) return ['pecho_triceps','espalda_biceps','piernas_full'];
-      if(numDays===4) return ['pecho_triceps','espalda_biceps','piernas_full','pecho_hombros'];
-      if(numDays===5) return ['pecho_triceps','espalda_biceps','piernas_full','pecho_hombros','brazos_core'];
-      return ['pecho_triceps','espalda_biceps','piernas_full','pecho_hombros','brazos_core','fullbody_m'];
+      if(numDays===4) return ['pecho_triceps','espalda_biceps','piernas_quad','pecho_hombros'];
+      if(numDays===5) return ['pecho_triceps','espalda_biceps','hombros_core','piernas_quad','pecho_triceps'];
+      return ['pecho_triceps','espalda_biceps','piernas_quad','hombros_core','piernas_posterior','pecho_triceps'];
     }
     // Male with glute priority
     if(priGluteos){
-      if(numDays<=3) return ['gluteos_piernas','upper_full','gluteos_isquios'];
-      if(numDays===4) return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull'];
-      if(numDays===5) return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull','piernas_full'];
-      return ['gluteos_piernas','upper_push','gluteos_isquios','upper_pull','piernas_full','hombros_brazos'];
+      if(numDays<=3) return ['piernas_posterior','upper_full','piernas_quad'];
+      if(numDays===4) return ['piernas_posterior','upper_push','piernas_quad','upper_pull'];
+      if(numDays===5) return ['piernas_posterior','upper_push','piernas_quad','upper_pull','hombros_core'];
+      return ['piernas_posterior','upper_push','piernas_quad','upper_pull','hombros_core','piernas_quad'];
     }
-    // Male default
+    // Male default — nunca dos días de piernas seguidos
     if(numDays<=3) return ['pecho_triceps','espalda_biceps','piernas_full'];
-    if(numDays===4) return ['pecho_triceps','espalda_biceps','piernas_full','hombros_brazos'];
-    if(numDays===5) return ['pecho_triceps','espalda_biceps','piernas_full','hombros_brazos','upper_full'];
-    return ['pecho_triceps','espalda_biceps','piernas_full','hombros_brazos','upper_full','lower_full'];
+    if(numDays===4) return ['pecho_triceps','espalda_biceps','piernas_quad','hombros_core'];
+    if(numDays===5) return ['pecho_triceps','espalda_biceps','piernas_quad','hombros_core','piernas_posterior'];
+    return ['pecho_triceps','espalda_biceps','piernas_quad','hombros_core','piernas_posterior','brazos_core'];
   }
 
   // Build a workout from a session template key
@@ -1917,104 +1809,297 @@ function generateLocalPlan(){
   function buildSession(key){
     const s={exercises:[],muscles:[],name:'',duration:60};
     switch(key){
-      case 'gluteos_piernas':
-        s.name='🍑 GLÚTEOS & CUÁDRICEPS';
-        s.muscles=['Glúteos','Piernas'];
-        s.exercises=[...pick(EX.gluteos_compound,2),...pick(EX.piernas_compound,1),...pick(EX.gluteos_isolation,2),...pick(EX.piernas_isolation,1)];
+
+      case 'pecho_triceps':
+        // Press plano → press inclinado → pec deck → cruces → tríceps × 2
+        s.name='PECHO & TRÍCEPS';
+        s.muscles=['Pecho','Tríceps'];
+        {
+          // Filtrar ANTES del pick para que lesiones/equipo no rompan la distribución
+          const pechoSafe   = filterEquip(filterInjuries(EX.pecho_compound));
+          const pechoIsoSafe = filterEquip(filterInjuries(EX.pecho_isolation));
+          const tricepsSafe = filterEquip(filterInjuries(EX.triceps));
+          const p1 = pick(pechoSafe.filter(e=>e.type==='bench_press'),1);
+          const p2 = pick(pechoSafe.filter(e=>e.type==='incline_press'),1);
+          // Si no hay bench o incline disponible (ej. lesión hombro), coger cualquier pecho
+          const p1f = p1.length ? p1 : pick(pechoSafe,1);
+          const p2f = p2.length ? p2 : pick(pechoSafe.filter(e=>!p1f.map(x=>x.name).includes(e.name)),1);
+          const p3 = pick(pechoIsoSafe,1);
+          const p4 = pick(pechoIsoSafe.filter(e=>!p3.map(x=>x.name).includes(e.name)),1);
+          const t1 = pick(tricepsSafe,1);
+          const t2 = pick(tricepsSafe.filter(e=>!t1.map(x=>x.name).includes(e.name)),1);
+          s.exercises=[...p1f,...p2f,...p3,...p4,...t1,...t2];
+        }
         break;
-      case 'gluteos_isquios':
-        s.name='🍑 GLÚTEOS & ISQUIOTIBIALES';
+
+      case 'espalda_biceps':
+        // CORRECTO: toda la espalda junta → bíceps al final
+        s.name='ESPALDA & BÍCEPS';
+        s.muscles=['Espalda','Bíceps'];
+        {
+          // Filtrar bíceps ANTES de hacer pick para que lesiones no vacíen el segundo curl
+          const bicepsSafe = filterEquip(filterInjuries(EX.biceps));
+          const e1 = pick(EX.espalda_compound.filter(e=>e.type==='lat_pulldown'),1);
+          const e2 = pick(EX.espalda_compound.filter(e=>e.type==='row'),1);
+          const e3 = pick(EX.espalda_compound.filter(e=>
+            !e1.map(x=>x.name).includes(e.name) && !e2.map(x=>x.name).includes(e.name)
+          ),1);
+          const e4 = pick(EX.espalda_isolation.filter(e=>e.type==='face_pull'),1);
+          const b1 = pick(bicepsSafe,1);
+          const b2 = pick(bicepsSafe.filter(e=>!b1.map(x=>x.name).includes(e.name)),1);
+          s.exercises=[...e1,...e2,...e3,...e4,...b1,...b2];
+        }
+        break;
+
+      case 'piernas_full':
+        // Estructura: 1 cuádriceps compuesto + 1 prensa + 1 hip thrust + 1 femoral + 1 extensión + 1 gemelos
+        s.name='PIERNAS COMPLETO';
+        s.muscles=['Piernas','Glúteos'];
+        s.exercises=[
+          ...pick(EX.piernas_compound.filter(e=>e.type==='squat'),1),
+          ...pick(EX.piernas_compound.filter(e=>e.type==='leg_press'),1),
+          ...pick(EX.gluteos_compound.filter(e=>e.type==='hip_thrust'),1),
+          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Femoral')),1),
+          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Extensión')),1),
+          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Gemelo')),1)
+        ];
+        break;
+
+      case 'hombros_brazos':
+        // Estructura: 2 press hombros + 2 elevaciones + 1 bíceps + 1 tríceps
+        s.name='HOMBROS & BRAZOS';
+        s.muscles=['Hombros','Bíceps','Tríceps'];
+        s.exercises=[
+          ...pick(EX.hombros_compound,2),
+          ...pick(EX.hombros_isolation,2),
+          ...pick(EX.biceps,1),
+          ...pick(EX.triceps,1)
+        ];
+        break;
+
+      case 'pecho_hombros':
+        // Estructura: 2 press pecho + 1 aislamiento pecho + 2 press hombros + 1 elevaciones
+        s.name='PECHO & HOMBROS';
+        s.muscles=['Pecho','Hombros'];
+        s.exercises=[
+          ...pick(EX.pecho_compound.filter(e=>e.type==='bench_press'),1),
+          ...pick(EX.pecho_compound.filter(e=>e.type==='incline_press'),1),
+          ...pick(EX.pecho_isolation,1),
+          ...pick(EX.hombros_compound,2),
+          ...pick(EX.hombros_isolation,1)
+        ];
+        break;
+
+      case 'brazos_core':
+        // Estructura: 2 bíceps + 2 tríceps + 2 core
+        s.name='BRAZOS & CORE';
+        s.muscles=['Bíceps','Tríceps','Core'];
+        s.exercises=[
+          ...pick(EX.biceps,2),
+          ...pick(EX.triceps,2),
+          ...pick(EX.core,2)
+        ];
+        break;
+
+      case 'core_cardio':
+        s.name='CORE & ABDOMINALES';
+        s.muscles=['Core'];
+        s.exercises=[...pick(EX.core,6)];
+        break;
+
+      case 'hombros_core':
+        s.name='HOMBROS & CORE';
+        s.muscles=['Hombros','Core'];
+        {
+          const hompSafe = filterEquip(filterInjuries(EX.hombros_compound));
+          const homiSafe = filterEquip(filterInjuries(EX.hombros_isolation));
+          const coreSafe = filterEquip(filterInjuries(EX.core));
+          const h1 = pick(hompSafe,1);
+          const h2 = pick(hompSafe.filter(e=>!h1.map(x=>x.name).includes(e.name)),1);
+          const h3 = pick(homiSafe.filter(e=>e.name.includes('Lateral')),1);
+          const h4 = pick(homiSafe.filter(e=>e.name.includes('Pájaro')||e.name.includes('Pájaros')||e.name.includes('Face')),1);
+          const h3f = h3.length ? h3 : pick(homiSafe.filter(e=>!h4.map(x=>x.name).includes(e.name)),1);
+          const h4f = h4.length ? h4 : pick(homiSafe.filter(e=>!h1.map(x=>x.name).includes(e.name)&&!h2.map(x=>x.name).includes(e.name)&&!h3f.map(x=>x.name).includes(e.name)),1);
+          const c1 = pick(coreSafe,1);
+          const c2 = pick(coreSafe.filter(e=>!c1.map(x=>x.name).includes(e.name)),1);
+          s.exercises=[...h1,...h2,...h3f,...h4f,...c1,...c2];
+        }
+        break;
+
+      case 'piernas_quad':
+        s.name='PIERNAS — CUÁDRICEPS';
+        s.muscles=['Piernas','Gemelos'];
+        {
+          const pcompSafe = filterEquip(filterInjuries(EX.piernas_compound));
+          const pisoSafe  = filterEquip(filterInjuries(EX.piernas_isolation));
+          const squat   = pick(pcompSafe.filter(e=>e.type==='squat'),1);
+          const press   = pick(pcompSafe.filter(e=>e.type==='leg_press'),1);
+          const exten   = pick(pisoSafe.filter(e=>e.name.includes('Extensión')),1);
+          const lunge   = pick(pcompSafe.filter(e=>e.type==='lunge'),1);
+          const gem1    = pick(pisoSafe.filter(e=>e.name.includes('Gemelo')&&e.name.includes('Pie')),1);
+          const gem2    = pick(pisoSafe.filter(e=>e.name.includes('Gemelo')&&e.name.includes('Sentado')),1);
+          // Fallbacks si algún equipo no tiene
+          const squatF  = squat.length  ? squat  : pick(pcompSafe,1);
+          const pressF  = press.length  ? press  : pick(pcompSafe.filter(e=>!squatF.map(x=>x.name).includes(e.name)),1);
+          const gem1F   = gem1.length   ? gem1   : pick(pisoSafe.filter(e=>e.name.includes('Gemelo')),1);
+          const gem2F   = gem2.length   ? gem2   : pick(pisoSafe.filter(e=>e.name.includes('Gemelo')&&!gem1F.map(x=>x.name).includes(e.name)),1);
+          s.exercises=[...squatF,...pressF,...exten,...lunge,...gem1F,...gem2F];
+        }
+        break;
+
+      case 'piernas_posterior':
+        s.name='PIERNAS — POSTERIOR & GLÚTEOS';
+        s.muscles=['Glúteos','Isquiotibiales'];
+        {
+          const gcompSafe = filterEquip(filterInjuries(EX.gluteos_compound));
+          const gisoSafe  = filterEquip(filterInjuries(EX.gluteos_isolation));
+          const pisoSafe  = filterEquip(filterInjuries(EX.piernas_isolation));
+          const hip   = pick(gcompSafe.filter(e=>e.type==='hip_thrust'),1);
+          const rdl   = pick(gcompSafe.filter(e=>e.type==='rdl'),1);
+          const femS  = pick(pisoSafe.filter(e=>e.name.includes('Femoral')&&e.name.includes('Sentado')),1);
+          const femT  = pick(pisoSafe.filter(e=>e.name.includes('Femoral')&&e.name.includes('Tumbado')),1);
+          const abd   = pick(gisoSafe.filter(e=>e.name.includes('Abductor')||e.name.includes('Patada')),1);
+          const pte   = pick(gisoSafe.filter(e=>e.name.includes('Puente')||e.name.includes('Caminata')),1);
+          const hipF  = hip.length ? hip : pick(gcompSafe,1);
+          const rdlF  = rdl.length ? rdl : pick(gcompSafe.filter(e=>!hipF.map(x=>x.name).includes(e.name)),1);
+          const femSF = femS.length ? femS : pick(pisoSafe.filter(e=>e.name.includes('Femoral')),1);
+          const femTF = femT.length ? femT : pick(pisoSafe.filter(e=>e.name.includes('Femoral')&&!femSF.map(x=>x.name).includes(e.name)),1);
+          s.exercises=[...hipF,...rdlF,...femSF,...femTF,...abd,...pte];
+        }
+        break;
+
+      case 'gluteos_piernas':
+        s.name='GLÚTEOS & PIERNAS';
         s.muscles=['Glúteos','Piernas'];
         s.exercises=[
-          EX.gluteos_compound.find(e=>e.name.includes('Hip Thrust'))||EX.gluteos_compound[0],
-          EX.gluteos_compound.find(e=>e.name.includes('Rumano'))||EX.gluteos_compound[3],
-          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Curl')||e.name.includes('Zancada')),1),
+          ...pick(EX.gluteos_compound,2),
+          ...pick(EX.piernas_compound,1),
           ...pick(EX.gluteos_isolation,2),
-          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1),
-        ].filter(Boolean);
+          ...pick(EX.piernas_isolation.filter(e=>!e.name.includes('Talones')),1)
+        ];
         break;
-      case 'fullbody_glute':
-        s.name='⚡ FULL BODY + GLÚTEO';
-        s.muscles=['Glúteos','Pecho','Espalda'];
-        s.exercises=[...pick(EX.gluteos_compound,2),...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.gluteos_isolation,1),...pick(EX.core,1)];
-        break;
-      case 'upper_light':
-        s.name='💪 TREN SUPERIOR';
-        s.muscles=['Pecho','Espalda','Hombros'];
-        s.exercises=[...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,2),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1),...pick(EX.triceps,1)];
-        break;
-      case 'upper_push':
-        s.name='🔥 EMPUJE (PUSH)';
-        s.muscles=['Pecho','Hombros','Tríceps'];
-        s.exercises=[...pick(EX.pecho_compound,2),...pick(EX.hombros_compound,1),...pick(EX.pecho_isolation,1),...pick(EX.hombros_isolation,1),...pick(EX.triceps,1)];
-        break;
-      case 'upper_pull':
-        s.name='💪 TIRÓN (PULL)';
-        s.muscles=['Espalda','Bíceps'];
-        s.exercises=[...pick(EX.espalda_compound,3),...pick(EX.espalda_isolation,1),...pick(EX.biceps,2)];
-        break;
-      case 'lower_full':
-        s.name='🦵 PIERNAS COMPLETO';
-        s.muscles=['Piernas','Glúteos'];
-        s.exercises=[...pick(EX.piernas_compound,2),...pick(EX.gluteos_compound,1),...pick(EX.piernas_isolation,2),...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1)];
-        break;
-      case 'lower_glute':
-        s.name='🍑 TREN INFERIOR + GLÚTEO';
+
+      case 'gluteos_isquios':
+        s.name='GLÚTEOS & ISQUIOTIBIALES';
         s.muscles=['Glúteos','Piernas'];
-        s.exercises=[...pick(EX.gluteos_compound,2),...pick(EX.piernas_compound,1),...pick(EX.gluteos_isolation,2),...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1)];
+        s.exercises=[
+          ...pick(EX.gluteos_compound,2),
+          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Curl')||e.name.includes('Rumano')),2),
+          ...pick(EX.gluteos_isolation,2)
+        ];
         break;
-      case 'upper_full':
-        s.name='🏋️ TREN SUPERIOR COMPLETO';
-        s.muscles=['Pecho','Espalda','Hombros'];
-        s.exercises=[...pick(EX.pecho_compound,2),...pick(EX.espalda_compound,2),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1)];
+
+      case 'upper_push':
+        // Push real: press plano + press inclinado + press hombros + elevaciones + tríceps polea + tríceps
+        s.name='EMPUJE — PECHO, HOMBROS & TRÍCEPS';
+        s.muscles=['Pecho','Hombros','Tríceps'];
+        {
+          const p1 = pick(EX.pecho_compound.filter(e=>e.type==='bench_press'),1);
+          const p2 = pick(EX.pecho_compound.filter(e=>e.type==='incline_press'),1);
+          const h1 = pick(EX.hombros_compound,1);
+          const h2 = pick(EX.hombros_isolation.filter(e=>e.name.includes('Lateral')),1);
+          const t1 = pick(EX.triceps.filter(e=>e.equipment.includes('Polea')),1);
+          const t2 = pick(EX.triceps.filter(e=>!t1.map(x=>x.name).includes(e.name)),1);
+          s.exercises=[...p1,...p2,...h1,...h2,...t1,...t2];
+        }
         break;
-      case 'fullbody_f':
-        s.name='⚡ FULL BODY';
-        s.muscles=['Piernas','Glúteos','Espalda','Pecho'];
-        s.exercises=[...pick(EX.gluteos_compound,1),...pick(EX.piernas_compound,1),...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.hombros_isolation,1),...pick(EX.core,1)];
-        break;
-      case 'fullbody_m':
-        s.name='⚡ FULL BODY';
-        s.muscles=['Pecho','Espalda','Piernas'];
-        s.exercises=[...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.piernas_compound,1),...pick(EX.hombros_compound,1),...pick(EX.biceps,1),...pick(EX.core,1)];
-        break;
-      case 'pecho_triceps':
-        s.name='🔥 PECHO & TRÍCEPS';
-        s.muscles=['Pecho','Tríceps'];
-        s.exercises=[...pick(EX.pecho_compound,3),...pick(EX.pecho_isolation,1),...pick(EX.triceps,2)];
-        break;
-      case 'espalda_biceps':
-        s.name='💪 ESPALDA & BÍCEPS';
+
+      case 'upper_pull':
+        s.name='TIRÓN — ESPALDA & BÍCEPS';
         s.muscles=['Espalda','Bíceps'];
-        s.exercises=[...pick(EX.espalda_compound,3),...pick(EX.espalda_isolation,1),...pick(EX.biceps,2)];
+        s.exercises=[
+          ...pick(EX.espalda_compound,3),
+          ...pick(EX.espalda_isolation,1),
+          ...pick(EX.biceps,2)
+        ];
         break;
-      case 'piernas_full':
-        s.name='🦵 PIERNAS COMPLETO';
+
+      case 'upper_full':
+        s.name='TREN SUPERIOR COMPLETO';
+        s.muscles=['Pecho','Espalda','Hombros','Bíceps','Tríceps'];
+        s.exercises=[
+          ...pick(EX.pecho_compound,1),
+          ...pick(EX.espalda_compound,1),
+          ...pick(EX.hombros_compound,1),
+          ...pick(EX.pecho_isolation,1),
+          ...pick(EX.biceps,1),
+          ...pick(EX.triceps,1)
+        ];
+        break;
+
+      case 'upper_light':
+        s.name='TREN SUPERIOR LIGERO';
+        s.muscles=['Pecho','Espalda','Hombros','Bíceps','Tríceps'];
+        s.exercises=[
+          ...pick(EX.pecho_compound,1),
+          ...pick(EX.espalda_compound,1),
+          ...pick(EX.hombros_isolation,1),
+          ...pick(EX.biceps,1),
+          ...pick(EX.triceps,1)
+        ];
+        break;
+
+      case 'lower_full':
+        s.name='PIERNAS COMPLETO';
         s.muscles=['Piernas','Glúteos'];
-        s.exercises=[...pick(EX.piernas_compound,2),...pick(EX.gluteos_compound,1),...pick(EX.piernas_isolation,2),...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')),1)];
+        s.exercises=[
+          ...pick(EX.piernas_compound,2),
+          ...pick(EX.gluteos_compound,1),
+          ...pick(EX.piernas_isolation.filter(e=>!e.name.includes('Talones')),2),
+          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')||e.name.includes('Gemelos')),1)
+        ];
         break;
-      case 'hombros_brazos':
-        s.name='🦾 HOMBROS & BRAZOS';
-        s.muscles=['Hombros','Bíceps','Tríceps'];
-        s.exercises=[...pick(EX.hombros_compound,2),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1),...pick(EX.triceps,2)];
+
+      case 'lower_glute':
+        s.name='GLÚTEOS & PIERNAS';
+        s.muscles=['Glúteos','Piernas'];
+        s.exercises=[
+          ...pick(EX.gluteos_compound,2),
+          ...pick(EX.piernas_compound,1),
+          ...pick(EX.gluteos_isolation,2),
+          ...pick(EX.piernas_isolation.filter(e=>e.name.includes('Talones')||e.name.includes('Gemelos')),1)
+        ];
         break;
-      case 'pecho_hombros':
-        s.name='🔥 PECHO & HOMBROS';
-        s.muscles=['Pecho','Hombros'];
-        s.exercises=[...pick(EX.pecho_compound,2),...pick(EX.hombros_compound,1),...pick(EX.pecho_isolation,1),...pick(EX.hombros_isolation,2)];
+
+      case 'fullbody_m':
+        s.name='FULL BODY';
+        s.muscles=['Pecho','Espalda','Piernas','Hombros'];
+        s.exercises=[
+          ...pick(EX.piernas_compound,1),
+          ...pick(EX.pecho_compound,1),
+          ...pick(EX.espalda_compound,1),
+          ...pick(EX.hombros_compound,1),
+          ...pick(EX.biceps,1),
+          ...pick(EX.core,1)
+        ];
         break;
-      case 'brazos_core':
-        s.name='💪 BRAZOS & CORE';
-        s.muscles=['Bíceps','Tríceps','Core'];
-        s.exercises=[...pick(EX.biceps,2),...pick(EX.triceps,2),...pick(EX.core,2)];
+
+      case 'fullbody_f':
+        s.name='FULL BODY';
+        s.muscles=['Glúteos','Piernas','Pecho','Espalda'];
+        s.exercises=[
+          ...pick(EX.gluteos_compound,1),
+          ...pick(EX.piernas_compound,1),
+          ...pick(EX.pecho_compound,1),
+          ...pick(EX.espalda_compound,1),
+          ...pick(EX.hombros_isolation,1),
+          ...pick(EX.core,1)
+        ];
         break;
-      case 'core_cardio':
-        s.name='🧱 CORE & FUNCIONAL';
-        s.muscles=['Core','Glúteos','Hombros'];
-        s.exercises=[...pick(EX.core,3),...pick(EX.gluteos_isolation,1),...pick(EX.hombros_isolation,1),...pick(EX.piernas_isolation,1)];
+
+      case 'fullbody_glute':
+        s.name='FULL BODY — ÉNFASIS GLÚTEOS';
+        s.muscles=['Glúteos','Piernas','Pecho','Espalda'];
+        s.exercises=[
+          ...pick(EX.gluteos_compound,2),
+          ...pick(EX.piernas_compound,1),
+          ...pick(EX.pecho_compound,1),
+          ...pick(EX.espalda_compound,1),
+          ...pick(EX.core,1)
+        ];
         break;
       default:
-        s.name='💪 ENTRENO GENERAL';
+        s.name='ENTRENO GENERAL';
         s.muscles=['Full Body'];
         s.exercises=[...pick(EX.pecho_compound,1),...pick(EX.espalda_compound,1),...pick(EX.piernas_compound,1),...pick(EX.hombros_isolation,1),...pick(EX.biceps,1),...pick(EX.core,1)];
     }
@@ -2096,7 +2181,7 @@ function generateLocalPlan(){
     espalda_baja:['Peso Muerto','Remo con Barra','Sentadilla con Barra'],
     muneca:['Curl con Barra','Press de Banca','Flexiones'],
     cuello:['Press Militar','Encogimientos'],
-    codo:['Curl','Extensión','Jalón de Tríceps','Rompecráneos','Fondos']
+    codo:['Curl con Barra','Curl Barra','Press Francés','Rompecráneos','Fondos en Paralelas','Fondos en Banco']
   };
   function filterInjuries(exercises){
     if(!injuries.length)return exercises;
@@ -2141,12 +2226,33 @@ function generateLocalPlan(){
       }
     });
     
-    // Ensure minimum exercises
+    // Ensure all required muscles are represented after injury/equipment filtering
+    const sm=sess.muscles||[];
+    const existing=new Set(sess.exercises.map(e=>e.name));
+    // First: ensure each required muscle has at least 1 exercise
+    const musclePoolMap={
+      'Pecho':[...EX.pecho_isolation,...EX.pecho_compound],
+      'Tríceps':[...EX.triceps],
+      'Espalda':[...EX.espalda_compound,...EX.espalda_isolation],
+      'Bíceps':[...EX.biceps],
+      'Hombros':[...EX.hombros_compound,...EX.hombros_isolation],
+      'Piernas':[...EX.piernas_compound,...EX.piernas_isolation],
+      'Glúteos':[...EX.gluteos_compound,...EX.gluteos_isolation],
+      'Core':[...EX.core],
+    };
+    sm.forEach(muscle=>{
+      const hasMuscle=sess.exercises.some(ex=>ex.muscle.includes(muscle)||muscle.includes(ex.muscle));
+      if(!hasMuscle){
+        const pool=filterEquip(filterInjuries(musclePoolMap[muscle]||[]));
+        const candidate=pool.find(ex=>!existing.has(ex.name));
+        if(candidate){sess.exercises.push({...candidate});existing.add(candidate.name);}
+      }
+    });
+    // Then: fill to minimum 5 exercises from session-appropriate pools
     if(sess.exercises.length<5){
-      // Fill up from related pools until we have 5
-      const fillers=[...EX.core,...EX.gluteos_isolation,...EX.hombros_isolation,...EX.piernas_isolation,...EX.biceps,...EX.triceps];
+      let fillers=[];
+      sm.forEach(m=>{const p=musclePoolMap[m]||[];fillers.push(...p);});
       const filtered=filterEquip(filterInjuries(fillers));
-      const existing=new Set(sess.exercises.map(e=>e.name));
       for(const ex of filtered){
         if(sess.exercises.length>=5)break;
         if(!existing.has(ex.name)){sess.exercises.push({...ex});existing.add(ex.name);}
