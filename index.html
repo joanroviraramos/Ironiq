@@ -1663,6 +1663,8 @@ REGLAS DE ENTRENADOR EXPERTO:
 - Descanso entre series: fuerza→180-240s compuestos / hipertrofia→90-120s compuestos, 60s aislamiento / definición y resistencia→45-60s todo
 - 3 tips técnicos ESPECÍFICOS y ÚTILES por ejercicio (no genéricos, menciona ajustes de la máquina si aplica)
 - Nombres de sesión creativos y motivadores${injuryList.length?'\n- CRÍTICO: NO incluyas ejercicios que carguen: '+injuryList.join(', ')+'. Siempre alternativa en máquina guiada.':''}
+- COHERENCIA MUSCULAR OBLIGATORIA: cada sesión debe trabajar SOLO los músculos del título. Si la sesión es "Pecho y Tríceps" → SOLO ejercicios de pecho y tríceps, NUNCA core, piernas ni hombros. Si es "Hombros y Brazos" → SOLO hombros, bíceps y tríceps. Si es "Espalda y Bíceps" → SOLO espalda y bíceps. El core se puede incluir como 1 ejercicio final SOLO en sesiones Full Body o si el estilo es Weider con día específico de core.
+- DISTRIBUCIÓN por sesión: primero todos los compuestos del grupo principal, luego aislamiento del grupo principal, luego accesorios del grupo secundario. NUNCA mezcles grupos de días diferentes.
 
 RESPONDE SOLO JSON (sin markdown, sin backticks, sin explicaciones):
 {"plan":[{"day":"Lunes","name":"NOMBRE CREATIVO","duration":65,"muscles":["M1","M2"],"exercises":[{"name":"Nombre Ejercicio","muscle":"Músculo","equipment":"Equipo","type":"bench_press","sets":4,"reps":"8-10","weight":"60","rest":"90s","tips":["tip técnico 1","tip técnico 2","tip técnico 3"]}]}]}
@@ -1672,12 +1674,12 @@ Tipos válidos para "type": bench_press,incline_press,push_up,cable_fly,dip,pull
   try{
     let apiOk=false,d=null;
     try{
-      const geminiBody={contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}};
-      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MDL}:generateContent?key=${GEMINI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(geminiBody)});
+      const claudeBody={model:'claude-sonnet-4-20250514',max_tokens:8000,messages:[{role:'user',content:prompt}]};
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(claudeBody)});
       if(r.ok){d=await r.json();apiOk=true;}
     }catch(e){}
-    if(apiOk&&d?.candidates?.length){
-      const txt=d.candidates[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
+    if(apiOk&&d?.content?.length){
+      const txt=d.content.map(b=>b.text||'').join('');
       const s=txt.indexOf('{'),e=txt.lastIndexOf('}');
       if(s!==-1&&e!==-1){plan=JSON.parse(txt.slice(s,e+1)).plan;storageSet('iq3_plan',JSON.stringify(plan));seriesState={};updateDash();toast('¡Plan personalizado generado! 🎉','ok');}
       else throw new Error('parse');
