@@ -318,14 +318,14 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 .ex-block-add:active{color:var(--accent)}
 
 /* ── WORKOUT CHAT ── */
-.wk-chat{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:16px}
-.wk-chat-hd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px}
+
+
 .ai-pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(57,224,128,.4)}50%{opacity:.7;box-shadow:0 0 0 6px transparent}}
 .chat-body{height:180px;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-.cmsg{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;max-width:88%}
-.cmsg.user{background:rgba(245,255,80,.12);border:1px solid rgba(245,255,80,.2);align-self:flex-end}
-.cmsg.ai{background:var(--card2);border:1px solid var(--border2);align-self:flex-start}
+
+
+
 .chat-inp-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border)}
 .chat-inp{flex:1;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
 .chat-inp:focus{border-color:var(--accent)}
@@ -569,8 +569,8 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 .prg-top span:last-child{color:var(--text2);font-family:'SF Mono','Menlo','Courier New',monospace;font-size:11px}
 .prg-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
 .prg-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 1.3s cubic-bezier(.4,0,.2,1)}
-.prof-chat-w{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.prof-chat-hd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px}
+
+
 
 /* ── EDIT PROFILE MODAL ── */
 .ep-bg{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:900;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(10px)}
@@ -929,16 +929,7 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
         <span>Sesión activa · <b id="sess-elapsed" style="color:var(--green);font-family:'SF Mono','Menlo','Courier New',monospace">00:00</b></span>
       </div>
     </div>
-    <div class="ex-det-list" id="ex-det-list"></div>
-    <div class="wk-chat">
-      <div class="wk-chat-hd"><div class="ai-pulse"></div>Pregunta al entrenador</div>
-      <div class="chat-body" id="wk-msgs"></div>
-      <div class="chat-inp-row">
-        <input class="chat-inp" id="wk-inp" placeholder="¿Puedo sustituir este ejercicio?" onkeydown="if(event.key==='Enter')sendWkChat()">
-        <button class="chat-send" onclick="sendWkChat()">Enviar</button>
-      </div>
-    </div>
-  </div></div>
+    <div class="ex-det-list" id="ex-det-list"></div></div>
 
   <!-- HISTORY -->
   <div class="pg" id="pg-history"><div class="pi">
@@ -1036,14 +1027,6 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
     <div class="stitle">PROGRESO MUSCULAR</div>
     <div class="mini-cal" id="prof-muscles" style="padding:16px"></div>
     <div class="stitle">ENTRENADOR IA</div>
-    <div class="prof-chat-w">
-      <div class="prof-chat-hd"><div class="ai-pulse"></div>Chat con GND</div>
-      <div class="chat-body" id="prof-msgs" style="height:220px"></div>
-      <div class="chat-inp-row">
-        <input class="chat-inp" id="prof-inp" placeholder="¿Qué debo comer antes de entrenar?" onkeydown="if(event.key==='Enter')sendChat()">
-        <button class="chat-send" onclick="sendChat()">Enviar</button>
-      </div>
-    </div>
   </div></div>
 </div>
 
@@ -1301,8 +1284,7 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 // ═══════════════════════════════════════════
 // GND v1 — Complete App
 // ═══════════════════════════════════════════
-const MDL = 'gemini-2.0-flash';
-const GEMINI_KEY = 'AIzaSyDz1H9Rrw7a8j1-Kr30C0GKDCS55dcVr7k';
+
 
 // STATE
 let profile=null, plan=[], history=[];
@@ -2197,7 +2179,7 @@ function openDetail(idx){
   document.getElementById('det-name').textContent=w.name;
   if(!seriesState[idx]){seriesState[idx]={};w.exercises.forEach((_,i)=>seriesState[idx][i]=0);}
   renderDetExs(idx);
-  document.getElementById('wk-msgs').innerHTML='';
+  
   restoreSessionUI();
   goPage('detail');
 }
@@ -2953,62 +2935,9 @@ function togHistEntry(i){
   const open=e.classList.toggle('on');a.textContent=open?'↓':'›';
 }
 
-// ── AI CHAT — Gemini ──
-async function callAI(messages, sys='') {
-  // Gemini requiere alternancia estricta user/model, siempre empezando por user
-  let geminiMsgs = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
-  // Eliminar mensajes consecutivos del mismo rol
-  geminiMsgs = geminiMsgs.filter((m, i) => i === 0 || m.role !== geminiMsgs[i-1].role);
-  // Siempre debe empezar por user
-  while (geminiMsgs.length && geminiMsgs[0].role !== 'user') geminiMsgs.shift();
-  if (!geminiMsgs.length) geminiMsgs = [{ role: 'user', parts: [{ text: messages[messages.length-1]?.content || 'Hola' }] }];
 
-  const body = {
-    system_instruction: sys ? { parts: [{ text: sys }] } : undefined,
-    contents: geminiMsgs,
-    generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
-  };
-  if (!body.system_instruction) delete body.system_instruction;
 
-  const r = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MDL}:generateContent?key=${GEMINI_KEY}`,
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-  );
-  if (!r.ok) {
-    const err = await r.json().catch(() => ({}));
-    throw new Error(err?.error?.message || 'Error ' + r.status);
-  }
-  const d = await r.json();
-  return d.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
-}
-async function sendChat(){
-  const inp=document.getElementById('prof-inp'),msgs=document.getElementById('prof-msgs');
-  const txt=inp.value.trim();if(!txt)return;inp.value='';
-  msgs.innerHTML+=`<div class="cmsg user">${txt}</div>`;
-  msgs.innerHTML+=`<div class="cmsg ai" id="ai-ld">✦ Pensando...</div>`;msgs.scrollTop=msgs.scrollHeight;
-  const gmap={volumen:'ganar músculo',definicion:'definición',fuerza:'fuerza',resistencia:'resistencia',perdida_peso:'perder peso',general:'fitness general'};
-  const sys=`Eres un entrenador personal experto. Usuario: ${profile?.name}, ${profile?.age} años, ${profile?.weight}kg, objetivo: ${gmap[profile?.goal]||'fitness'}, nivel: ${profile?.level}. Responde en español, directo, motivador, máximo 3 párrafos.`;
-  const hist=[];msgs.querySelectorAll('.cmsg:not(#ai-ld)').forEach(m=>hist.push({role:m.classList.contains('user')?'user':'assistant',content:m.textContent}));
-  hist.push({role:'user',content:txt});
-  try{const r=await callAI(hist,sys);document.getElementById('ai-ld').outerHTML=`<div class="cmsg ai">${r}</div>`;}
-  catch(e){document.getElementById('ai-ld').outerHTML=`<div class="cmsg ai">Error: ${e.message}</div>`;}
-  msgs.scrollTop=msgs.scrollHeight;
-}
-async function sendWkChat(){
-  const inp=document.getElementById('wk-inp'),msgs=document.getElementById('wk-msgs');
-  const txt=inp.value.trim();if(!txt)return;inp.value='';
-  msgs.innerHTML+=`<div class="cmsg user">${txt}</div>`;
-  msgs.innerHTML+=`<div class="cmsg ai" id="wk-ld">✦ Pensando...</div>`;msgs.scrollTop=msgs.scrollHeight;
-  const w=curWkIdx!==null?plan[curWkIdx]:null;
-  const exList=w?w.exercises.map(e=>`${e.name}: ${e.sets}×${e.reps}`).join(', '):'';
-  const sys=`Eres un entrenador personal. Sesión actual: "${w?.name||''}" con: ${exList}. Perfil: ${profile?.weight}kg, nivel ${profile?.level}. Responde en español, conciso y útil.`;
-  try{const r=await callAI([{role:'user',content:txt}],sys);document.getElementById('wk-ld').outerHTML=`<div class="cmsg ai">${r}</div>`;}
-  catch(e){document.getElementById('wk-ld').outerHTML=`<div class="cmsg ai">Error: ${e.message}</div>`;}
-  msgs.scrollTop=msgs.scrollHeight;
-}
+
 
 // ── TOAST ──
 function toast(msg,type='ok'){
