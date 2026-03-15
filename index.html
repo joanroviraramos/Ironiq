@@ -1301,7 +1301,8 @@ input,select,textarea,button{font-family:inherit;-webkit-appearance:none}
 // ═══════════════════════════════════════════
 // GND v1 — Complete App
 // ═══════════════════════════════════════════
-const MDL = 'claude-sonnet-4-20250514';
+const MDL = 'gemini-2.0-flash';
+const GEMINI_KEY = 'AIzaSyAPSKjIPVh6SoWCAOHfX1lUvGhV0ZfQQaw';
 
 // STATE
 let profile=null, plan=[], history=[];
@@ -1688,11 +1689,12 @@ Tipos válidos para "type": bench_press,incline_press,push_up,cable_fly,dip,pull
   try{
     let apiOk=false,d=null;
     try{
-      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:MDL,max_tokens:8000,messages:[{role:'user',content:prompt}]})});
+      const geminiBody={contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}};
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MDL}:generateContent?key=${GEMINI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(geminiBody)});
       if(r.ok){d=await r.json();apiOk=true;}
     }catch(e){}
-    if(apiOk&&d?.content?.length){
-      const txt=d.content.map(b=>b.text||'').join('');
+    if(apiOk&&d?.candidates?.length){
+      const txt=d.candidates[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
       const s=txt.indexOf('{'),e=txt.lastIndexOf('}');
       if(s!==-1&&e!==-1){plan=JSON.parse(txt.slice(s,e+1)).plan;storageSet('iq3_plan',JSON.stringify(plan));seriesState={};updateDash();toast('¡Plan personalizado generado! 🎉','ok');}
       else throw new Error('parse');
@@ -2951,18 +2953,36 @@ function togHistEntry(i){
   const open=e.classList.toggle('on');a.textContent=open?'↓':'›';
 }
 
-// ── AI CHAT ──
-async function callAI(messages,sys=''){
-  const body={model:MDL,max_tokens:1000,messages};
-  if(sys)body.system=sys;
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if(!r.ok) throw new Error('API no disponible');
-  const d=await r.json();
-  return d.content.map(b=>b.text||'').join('');
+// ── AI CHAT — Gemini ──
+async function callAI(messages, sys='') {
+  // Gemini requiere alternancia estricta user/model, siempre empezando por user
+  let geminiMsgs = messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+  // Eliminar mensajes consecutivos del mismo rol
+  geminiMsgs = geminiMsgs.filter((m, i) => i === 0 || m.role !== geminiMsgs[i-1].role);
+  // Siempre debe empezar por user
+  while (geminiMsgs.length && geminiMsgs[0].role !== 'user') geminiMsgs.shift();
+  if (!geminiMsgs.length) geminiMsgs = [{ role: 'user', parts: [{ text: messages[messages.length-1]?.content || 'Hola' }] }];
+
+  const body = {
+    system_instruction: sys ? { parts: [{ text: sys }] } : undefined,
+    contents: geminiMsgs,
+    generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+  };
+  if (!body.system_instruction) delete body.system_instruction;
+
+  const r = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MDL}:generateContent?key=${GEMINI_KEY}`,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+  );
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(err?.error?.message || 'Error ' + r.status);
+  }
+  const d = await r.json();
+  return d.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
 }
 async function sendChat(){
   const inp=document.getElementById('prof-inp'),msgs=document.getElementById('prof-msgs');
@@ -2974,7 +2994,7 @@ async function sendChat(){
   const hist=[];msgs.querySelectorAll('.cmsg:not(#ai-ld)').forEach(m=>hist.push({role:m.classList.contains('user')?'user':'assistant',content:m.textContent}));
   hist.push({role:'user',content:txt});
   try{const r=await callAI(hist,sys);document.getElementById('ai-ld').outerHTML=`<div class="cmsg ai">${r}</div>`;}
-  catch(e){document.getElementById('ai-ld').outerHTML=`<div class="cmsg ai">Error de conexión. Inténtalo de nuevo.</div>`;}
+  catch(e){document.getElementById('ai-ld').outerHTML=`<div class="cmsg ai">Error: ${e.message}</div>`;}
   msgs.scrollTop=msgs.scrollHeight;
 }
 async function sendWkChat(){
@@ -2986,7 +3006,7 @@ async function sendWkChat(){
   const exList=w?w.exercises.map(e=>`${e.name}: ${e.sets}×${e.reps}`).join(', '):'';
   const sys=`Eres un entrenador personal. Sesión actual: "${w?.name||''}" con: ${exList}. Perfil: ${profile?.weight}kg, nivel ${profile?.level}. Responde en español, conciso y útil.`;
   try{const r=await callAI([{role:'user',content:txt}],sys);document.getElementById('wk-ld').outerHTML=`<div class="cmsg ai">${r}</div>`;}
-  catch(e){document.getElementById('wk-ld').outerHTML=`<div class="cmsg ai">Error de conexión.</div>`;}
+  catch(e){document.getElementById('wk-ld').outerHTML=`<div class="cmsg ai">Error: ${e.message}</div>`;}
   msgs.scrollTop=msgs.scrollHeight;
 }
 
